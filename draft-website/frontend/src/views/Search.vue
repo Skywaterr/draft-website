@@ -69,7 +69,6 @@
               <div class="text-h5 text-center my-2" style="color: #000000;">OR</div>
 
               <!-- Pokemon Tier (divider BEFORE, no divider after) -->
-              <v-divider class="my-4" thickness="2" color="#000000"></v-divider>
               <div class="mb-6">
                 <div class="d-flex align-center justify-center mb-4">
                   <span class="text-h6 mr-4" style="color: #000000;">Pokemon Tier</span>
@@ -82,7 +81,6 @@
               <div class="text-h5 text-center my-2" style="color: #000000;">OR</div>
 
               <!-- Type Matchups (divider BEFORE, no divider after) -->
-              <v-divider class="my-4" thickness="2" color="#000000"></v-divider>
               <div class="mb-6">
                 <div class="d-flex align-center justify-center mb-4">
                   <span class="text-h6 mr-4" style="color: #000000;">Type Matchups</span>
@@ -93,7 +91,6 @@
               <!-- Third OR (divider before) -->
               <v-divider class="my-4" thickness="2" color="#000000"></v-divider>
               <div class="text-h5 text-center my-2" style="color: #000000;">OR</div>
-              <v-divider class="my-4" thickness="2" color="#000000"></v-divider>
 
               <!-- Advanced Search Button -->
               <div class="text-center mt-6">
