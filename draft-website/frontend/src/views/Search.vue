@@ -203,7 +203,7 @@
                         size="small"
                         variant="flat"
                       >
-                        Reset Point Settings
+                        Reset Point settings
                       </v-btn>
                     </div>
                   </fieldset>
@@ -271,7 +271,7 @@
                         size="small"
                         variant="flat"
                       >
-                        Reset Point Settings
+                        Reset Point settings
                       </v-btn>
                     </div>
                   </fieldset>
