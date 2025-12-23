@@ -1,0 +1,20 @@
+The SQL database with all the Pokemon and its stats is hosted on Turso.
+You must log in as skywaterr in order to edit the database on Turso's dashboard.
+The problem with this is that Turso's dashboard allows you to edit data one row at a time,
+and you cannot import a CSV.
+
+So the other option is to use Turso's CLI to edit, but you will have to do a lot more stuff,
+just like how John was tortured into doing it. These are the steps.
+
+1. If you are using Windows, you have to use wsl to curl the executable. John uses wsl Ubuntu,
+   and that one is the recommended one because there is less installation steps.
+
+2. Once Turso is installed, you will not have your CSV file directly in the same directory.
+   /mnt is where your regular Windows directories. You will have to find the path to your CSV
+   and keep it somewhere.
+
+3. You will have to have sqlite3 installed in your vm.
+
+4. Use a command like this to push it onto the desired db/table: 
+    sqlite3 :memory: ".mode csv" "src/to/csv' table-name" ".dump" | turso db shell db-name
+   
