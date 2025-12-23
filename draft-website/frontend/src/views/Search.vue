@@ -114,7 +114,7 @@
             >
               <!-- GIGA ADVANCED Button - Top Right Corner -->
               <v-btn
-                style="background-color: #909000; color: #000000; position: absolute; top: 16px; right: 16px; font-size: 18px; font-weight: bold; text-transform: none !important;"
+                style="background-color: #909000; color: #000000; position: absolute; top: -20px; right: -54px; font-size: 20px; text-transform: none !important;"
                 variant="flat"
                 size="large"
                 @click="searchMode = 'giga'"

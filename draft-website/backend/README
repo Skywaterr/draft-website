@@ -15,6 +15,8 @@ just like how John was tortured into doing it. These are the steps.
 
 3. You will have to have sqlite3 installed in your vm.
 
-4. Use a command like this to push it onto the desired db/table: 
+4. Turso will need a key, so ChatGPT to find out how to get that.
+
+5. Use a command like this to push it onto the desired db/table: 
     sqlite3 :memory: ".mode csv" "src/to/csv' table-name" ".dump" | turso db shell db-name
    
