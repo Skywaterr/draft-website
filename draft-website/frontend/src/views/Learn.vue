@@ -77,7 +77,7 @@
                         </v-row>
 
                         <a href="#" class="content-link">
-                          <p class="text-h3 text-center content-text">Other Resources</p>
+                          <p class="video-title">Other Resources</p>
                         </a>
                       </v-expansion-panel-text>
                     </v-expansion-panel>
@@ -132,7 +132,7 @@
                         </v-row>
 
                         <a href="#" class="content-link">
-                          <p class="text-h3 text-center content-text">Other Resources</p>
+                          <p class="video-title">Other Resources</p>
                         </a>
                       </v-expansion-panel-text>
                     </v-expansion-panel>
@@ -242,7 +242,7 @@
                         </v-row>
 
                         <a href="#" class="content-link">
-                          <p class="text-h3 text-center content-text">Other Resources</p>
+                          <p class="video-title">Other Resources</p>
                         </a>
                       </v-expansion-panel-text>
                     </v-expansion-panel>
@@ -332,7 +332,7 @@
                         </v-row>
 
                         <a href="#" class="content-link">
-                          <p class="text-h3 text-center content-text">Other Resources</p>
+                          <p class="video-title">Other Resources</p>
                         </a>
                       </v-expansion-panel-text>
                     </v-expansion-panel>
@@ -368,7 +368,7 @@
                         </v-row>
 
                         <a href="#" class="content-link">
-                          <p class="text-h3 text-center content-text">Other Resources</p>
+                          <p class="video-title">Other Resources</p>
                         </a>
                       </v-expansion-panel-text>
                     </v-expansion-panel>
