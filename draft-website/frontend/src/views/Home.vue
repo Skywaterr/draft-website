@@ -48,7 +48,9 @@
                   variant="flat"
                   size="large"
                   class="nav-button"
-                  :to="item.path"
+                  :href="item.path === '/submit-battle' ? config.homeContent.battleSubmitUrl : undefined"
+                  :to="item.path === '/submit-battle' ? undefined : item.path"
+                  :target="item.path === '/submit-battle' ? '_blank' : undefined"
                 >
                   {{ item.name }}
                 </v-btn>
@@ -106,7 +108,7 @@
 
               <!-- Submit Battle Section -->
               <div class="content-section mb-12">
-                <a :href="config.homeContent.battleSubmitUrl" class="content-link">
+                <a :href="config.homeContent.battleSubmitUrl" target="_blank" class="content-link">
                   <p class="text-h6 text-center content-text">
                     {{ config.homeContent.battleSubmitLabel }}
                   </p>

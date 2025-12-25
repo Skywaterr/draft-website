@@ -27,7 +27,7 @@ export const siteConfig = {
     dataSheetLabel: 'Link to our data sheet(Roster, schedules, etc.)',
     dataSheetUrl: '#',
     battleSubmitLabel: 'Finished a battle? Submit the battle here!',
-    battleSubmitUrl: '#',
+    battleSubmitUrl: 'https://forms.gle/uNhY2DL4rrfnB8pY7',
     learnLabel: 'Want to learn about Pokemon, teambuilding, and more? Watch a video here!',
     learnVideoUrl: '#',
   },
