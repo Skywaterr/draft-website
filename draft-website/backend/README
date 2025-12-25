@@ -18,5 +18,9 @@ just like how John was tortured into doing it. These are the steps.
 4. Turso will need a key, so ChatGPT to find out how to get that.
 
 5. Use a command like this to push it onto the desired db/table: 
-    sqlite3 :memory: ".mode csv" "src/to/csv' table-name" ".dump" | turso db shell db-name
+    sqlite3 :memory: ".mode csv" ".import src/to/csv table-name" ".dump" | turso db shell db-name
    
+
+
+To start the server and retrieve data from the db, run npm start, and use the routes that
+are predefined in routes.js
