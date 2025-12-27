@@ -110,7 +110,7 @@
               </v-radio>
             </v-radio-group>
             
-            <div class="d-flex flex-wrap ga-3 mt-1">
+            <div class="d-flex flex-wrap ga-3 mt-1 justify-center">
               <div v-for="tier in tierGroups" :key="tier" class="d-flex align-items-center">
                 <v-checkbox
                   v-model="filters.draftTiers"
@@ -225,7 +225,7 @@
               </v-radio>
             </v-radio-group>
             
-            <div class="d-flex justify-center ga-4 mt-1">
+            <div class="d-flex justify-center mt-1 tera-type-checkboxes">
               <div v-for="num in [1, 2, 3, 4]" :key="num" class="d-flex align-items-center">
                 <v-checkbox
                   v-model="filters.teraTypeCount"
@@ -352,13 +352,12 @@
             <v-autocomplete
               v-model="filters.abilityName"
               :items="abilityNames"
-              label="Search by Ability Name"
+              placeholder="Search by Ability Name"
               variant="outlined"
               density="compact"
               hide-details
               bg-color="white"
               clearable
-              persistent-placeholder
               style="max-width: 400px;"
               @update:model-value="autoEnableAbilityCheckbox"
             ></v-autocomplete>
@@ -391,13 +390,12 @@
                   <v-autocomplete
                     v-model="move.name"
                     :items="moveNames"
-                    label="Move Name"
+                    placeholder="Move Name"
                     variant="outlined"
                     density="compact"
                     hide-details
                     bg-color="white"
                     clearable
-                    persistent-placeholder
                     @update:model-value="autoEnableMoveCheckbox(index)"
                   ></v-autocomplete>
                 </div>
@@ -429,8 +427,7 @@
                   hide-details
                   bg-color="white"
                   clearable
-                  label="--"
-                  persistent-placeholder
+                  placeholder="--"
                   style="max-width: 150px;"
                   @update:model-value="autoEnableMoveTypeCheckbox"
                 ></v-select>
@@ -453,8 +450,7 @@
                   hide-details
                   bg-color="white"
                   clearable
-                  label="--"
-                  persistent-placeholder
+                  placeholder="--"
                   style="max-width: 150px;"
                   @update:model-value="autoEnableMoveCategoryCheckbox"
                 ></v-select>
@@ -564,9 +560,8 @@
                 density="compact"
                 hide-details
                 bg-color="white"
-                label="--"
+                placeholder="--"
                 clearable
-                persistent-placeholder
                 class="type-dropdown"
                 @update:model-value="autoEnableTypeCheckbox('exactlyThese')"
               ></v-select>
@@ -597,9 +592,8 @@
                 density="compact"
                 hide-details
                 bg-color="white"
-                label="--"
+                placeholder="--"
                 clearable
-                persistent-placeholder
                 class="type-dropdown"
                 @update:model-value="autoEnableTypeCheckbox('resists')"
               ></v-select>
@@ -628,9 +622,8 @@
                 density="compact"
                 hide-details
                 bg-color="white"
-                label="Type to search"
+                placeholder="Type to search"
                 clearable
-                persistent-placeholder
                 class="type-dropdown-search"
                 @update:model-value="autoEnableTypeCheckbox('immuneTo')"
               ></v-autocomplete>
@@ -643,7 +636,7 @@
                 density="compact"
                 hide-details
                 bg-color="white"
-                label="--"
+                placeholder="--"
                 clearable
                 persistent-placeholder
                 class="type-dropdown"
@@ -676,9 +669,8 @@
                 density="compact"
                 hide-details
                 bg-color="white"
-                label="--"
+                placeholder="--"
                 clearable
-                persistent-placeholder
                 class="type-dropdown"
                 @update:model-value="autoEnableTypeCheckbox('notThese')"
               ></v-select>
@@ -1153,6 +1145,10 @@ const resetAllFilters = () => {
 .filter-section legend {
   color: #000000;
   font-weight: 600;
+}
+
+.tera-type-checkboxes {
+  gap: 100px; 
 }
 
 /* Force lowercase 's' in "Reset Point settings" (very necessary) */
