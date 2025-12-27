@@ -17,7 +17,13 @@ const OPS = {
 
 
 
+function statFilter(stats, args) {
+    // Add stat search to the current SQL query
+    // stats should be a list of required stats such as [atk, def, spd]
+    // args should be a mapping of operators to the values required, such as {gt: 50, lte: 100}
 
+    
+}
 
 
 // I need to take an argument instead of just adding Overgrow
