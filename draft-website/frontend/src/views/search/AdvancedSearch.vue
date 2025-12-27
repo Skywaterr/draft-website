@@ -357,7 +357,7 @@
               density="compact"
               hide-details
               bg-color="white"
-              clearable
+              :clearable="!!filters.abilityName"
               style="max-width: 400px;"
               @update:model-value="autoEnableAbilityCheckbox"
             ></v-autocomplete>
@@ -395,7 +395,7 @@
                     density="compact"
                     hide-details
                     bg-color="white"
-                    clearable
+                    :clearable="!!move.name"
                     @update:model-value="autoEnableMoveCheckbox(index)"
                   ></v-autocomplete>
                 </div>
@@ -426,7 +426,7 @@
                   density="compact"
                   hide-details
                   bg-color="white"
-                  clearable
+                  :clearable="!!filters.moveType.value"
                   placeholder="--"
                   style="max-width: 150px;"
                   @update:model-value="autoEnableMoveTypeCheckbox"
@@ -449,7 +449,7 @@
                   density="compact"
                   hide-details
                   bg-color="white"
-                  clearable
+                  :clearable="!!filters.moveCategory.value"
                   placeholder="--"
                   style="max-width: 150px;"
                   @update:model-value="autoEnableMoveCategoryCheckbox"
@@ -561,7 +561,7 @@
                 hide-details
                 bg-color="white"
                 placeholder="--"
-                clearable
+                :clearable="!!filters.typeFilters.exactlyThese.types[i-1]"
                 class="type-dropdown"
                 @update:model-value="autoEnableTypeCheckbox('exactlyThese')"
               ></v-select>
@@ -593,7 +593,7 @@
                 hide-details
                 bg-color="white"
                 placeholder="--"
-                clearable
+                :clearable="!!filters.typeFilters.resists.types[i-1]"
                 class="type-dropdown"
                 @update:model-value="autoEnableTypeCheckbox('resists')"
               ></v-select>
@@ -623,7 +623,7 @@
                 hide-details
                 bg-color="white"
                 placeholder="Type to search"
-                clearable
+                :clearable="!!filters.typeFilters.immuneTo.searchType"
                 class="type-dropdown-search"
                 @update:model-value="autoEnableTypeCheckbox('immuneTo')"
               ></v-autocomplete>
@@ -637,8 +637,7 @@
                 hide-details
                 bg-color="white"
                 placeholder="--"
-                clearable
-                persistent-placeholder
+                :clearable="!!filters.typeFilters.immuneTo.types[i-1]"
                 class="type-dropdown"
                 @update:model-value="autoEnableTypeCheckbox('immuneTo')"
               ></v-select>
@@ -670,7 +669,7 @@
                 hide-details
                 bg-color="white"
                 placeholder="--"
-                clearable
+                :clearable="!!filters.typeFilters.notThese.types[i-1]"
                 class="type-dropdown"
                 @update:model-value="autoEnableTypeCheckbox('notThese')"
               ></v-select>
@@ -1242,4 +1241,5 @@ const resetAllFilters = () => {
   display: inline-flex;
   align-items: center;
 }
+
 </style>
