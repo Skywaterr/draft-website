@@ -41,6 +41,7 @@
                     <span>Costs between</span>
                     <v-text-field
                       v-model.number="draftPriceMin"
+                      placeholder="Number"
                       variant="outlined"
                       density="compact"
                       hide-details
@@ -53,6 +54,7 @@
                     <span>and</span>
                     <v-text-field
                       v-model.number="draftPriceMax"
+                      placeholder="Number"
                       variant="outlined"
                       density="compact"
                       hide-details
@@ -69,7 +71,7 @@
             </v-radio-group>
             
             <!-- Validation Message for Draft Price -->
-            <div v-if="draftPriceError" class="text-caption mt-1 ml-8" style="color: #ff0000;">
+            <div v-if="draftPriceError" class="text-caption mt-1" style="color: #ff0000; margin-left: 40px;">
               {{ draftPriceError }}
             </div>
             
@@ -82,8 +84,9 @@
               show-ticks="always"
               tick-size="4"
               thumb-label
-              color="#000000"
+              color="#133AFF"
               track-color="rgba(0,0,0,0.2)"
+              thumb-color="white"
               class="mt-4"
             >
               <template v-slot:prepend>
@@ -95,7 +98,7 @@
             </v-range-slider>
           </div>
 
-          <v-divider class="my-4 aligned-divider" color="rgba(0,0,0,0.3)"></v-divider>
+          <v-divider class="my-2 aligned-divider" color="rgba(0,0,0,0.3)"></v-divider>
 
           <!-- Tier Selection Option -->
           <div>
@@ -107,7 +110,7 @@
               </v-radio>
             </v-radio-group>
             
-            <div class="d-flex flex-wrap ga-3 mt-2">
+            <div class="d-flex flex-wrap ga-3 mt-1 justify-center">
               <div v-for="tier in tierGroups" :key="tier" class="d-flex align-items-center">
                 <v-checkbox
                   v-model="filters.draftTiers"
@@ -153,6 +156,7 @@
                     <span>Costs between</span>
                     <v-text-field
                       v-model.number="teraPriceMin"
+                      placeholder="Number"
                       variant="outlined"
                       density="compact"
                       hide-details
@@ -165,6 +169,7 @@
                     <span>and</span>
                     <v-text-field
                       v-model.number="teraPriceMax"
+                      placeholder="Number"
                       variant="outlined"
                       density="compact"
                       hide-details
@@ -181,7 +186,7 @@
             </v-radio-group>
             
             <!-- Validation Message for Tera Price -->
-            <div v-if="teraPriceError" class="text-caption mt-1 ml-8" style="color: #ff0000;">
+            <div v-if="teraPriceError" class="text-caption mt-1" style="color: #ff0000; margin-left: 40px;">
               {{ teraPriceError }}
             </div>
 
@@ -194,8 +199,9 @@
               show-ticks="always"
               tick-size="4"
               thumb-label
-              color="#000000"
+              color="#133AFF"
               track-color="rgba(0,0,0,0.2)"
+              thumb-color="white"
               class="mt-4"
             >
               <template v-slot:prepend>
@@ -219,7 +225,7 @@
               </v-radio>
             </v-radio-group>
             
-            <div class="d-flex justify-center ga-4 mt-2">
+            <div class="d-flex justify-center mt-1 tera-type-checkboxes">
               <div v-for="num in [1, 2, 3, 4]" :key="num" class="d-flex align-items-center">
                 <v-checkbox
                   v-model="filters.teraTypeCount"
@@ -251,14 +257,14 @@
         </fieldset>
       </v-col>
 
-      <!-- Base Stats Section -->
+<!-- Base Stats Section -->
       <v-col cols="12">
         <fieldset class="filter-section pa-4">
           <legend class="text-h6 px-2">Base Stats</legend>
           
           <v-row>
             <!-- Left Column: Individual Stats -->
-            <v-col cols="12" md="8">
+            <v-col cols="12" md="6">
               <div 
                 v-for="stat in stats" 
                 :key="stat.id"
@@ -296,7 +302,7 @@
             </v-col>
 
             <!-- Right Column: BST -->
-            <v-col cols="12" md="4">
+            <v-col cols="12" md="6" class="d-flex flex-column justify-center">
               <div class="d-flex align-items-center ga-2 mb-3">
                 <v-checkbox
                   v-model="filters.bstEnabled" 
@@ -304,7 +310,7 @@
                   density="compact"
                   color="#000000"
                 ></v-checkbox>
-                <span style="color: #000000;">Base Stat Total (BST) is</span>
+                <span style="color: #000000; white-space: nowrap;">Base Stat Total (BST) is</span>
                 <v-select
                   v-model="filters.bstOperator"
                   :items="operators"
@@ -346,13 +352,12 @@
             <v-autocomplete
               v-model="filters.abilityName"
               :items="abilityNames"
-              label="Search by Ability Name"
+              placeholder="Search by Ability Name"
               variant="outlined"
               density="compact"
               hide-details
               bg-color="white"
               clearable
-              persistent-placeholder
               style="max-width: 400px;"
               @update:model-value="autoEnableAbilityCheckbox"
             ></v-autocomplete>
@@ -385,13 +390,12 @@
                   <v-autocomplete
                     v-model="move.name"
                     :items="moveNames"
-                    label="Move Name"
+                    placeholder="Move Name"
                     variant="outlined"
                     density="compact"
                     hide-details
                     bg-color="white"
                     clearable
-                    persistent-placeholder
                     @update:model-value="autoEnableMoveCheckbox(index)"
                   ></v-autocomplete>
                 </div>
@@ -399,7 +403,7 @@
             </v-row>
           </div>
 
-          <v-divider class="my-4" color="rgba(0,0,0,0.3)"></v-divider>
+          <v-divider class="my-2" color="rgba(0,0,0,0.3)"></v-divider>
 
           <!-- Learns an attacking move that is... -->
           <div>
@@ -423,8 +427,7 @@
                   hide-details
                   bg-color="white"
                   clearable
-                  label="--"
-                  persistent-placeholder
+                  placeholder="--"
                   style="max-width: 150px;"
                   @update:model-value="autoEnableMoveTypeCheckbox"
                 ></v-select>
@@ -447,8 +450,7 @@
                   hide-details
                   bg-color="white"
                   clearable
-                  label="--"
-                  persistent-placeholder
+                  placeholder="--"
                   style="max-width: 150px;"
                   @update:model-value="autoEnableMoveCategoryCheckbox"
                 ></v-select>
@@ -558,9 +560,8 @@
                 density="compact"
                 hide-details
                 bg-color="white"
-                label="--"
+                placeholder="--"
                 clearable
-                persistent-placeholder
                 class="type-dropdown"
                 @update:model-value="autoEnableTypeCheckbox('exactlyThese')"
               ></v-select>
@@ -591,9 +592,8 @@
                 density="compact"
                 hide-details
                 bg-color="white"
-                label="--"
+                placeholder="--"
                 clearable
-                persistent-placeholder
                 class="type-dropdown"
                 @update:model-value="autoEnableTypeCheckbox('resists')"
               ></v-select>
@@ -622,9 +622,8 @@
                 density="compact"
                 hide-details
                 bg-color="white"
-                label="Type to search"
+                placeholder="Type to search"
                 clearable
-                persistent-placeholder
                 class="type-dropdown-search"
                 @update:model-value="autoEnableTypeCheckbox('immuneTo')"
               ></v-autocomplete>
@@ -637,7 +636,7 @@
                 density="compact"
                 hide-details
                 bg-color="white"
-                label="--"
+                placeholder="--"
                 clearable
                 persistent-placeholder
                 class="type-dropdown"
@@ -670,9 +669,8 @@
                 density="compact"
                 hide-details
                 bg-color="white"
-                label="--"
+                placeholder="--"
                 clearable
-                persistent-placeholder
                 class="type-dropdown"
                 @update:model-value="autoEnableTypeCheckbox('notThese')"
               ></v-select>
@@ -773,12 +771,12 @@ const moveNames = ref<string[]>([
 const priceFilterType = ref<'range' | 'tier'>('range')
 const teraFilterType = ref<'range' | 'types'>('range')
 
-const draftPriceMin = ref<number | ''>('')
-const draftPriceMax = ref<number | ''>('')
+const draftPriceMin = ref<number>('1')
+const draftPriceMax = ref<number>('26')
 const draftPriceRange = ref([1, 26])
 
-const teraPriceMin = ref<number | ''>('')
-const teraPriceMax = ref<number | ''>('')
+const teraPriceMin = ref<number>('1')
+const teraPriceMax = ref<number>('20')
 const teraPriceRange = ref([1, 20])
 
 const sortBy = ref('Pokedex Number')
@@ -841,10 +839,10 @@ const stats = ref([
 ])
 
 const draftPriceError = computed(() => {
-  if (draftPriceMin.value !== '' && (draftPriceMin.value < 1 || draftPriceMin.value > 26)) {
+  if (draftPriceMin.value < 1 || draftPriceMin.value > 26) {
     return 'Draft price must be between 1 and 26 points.'
   }
-  if (draftPriceMax.value !== '' && (draftPriceMax.value < 1 || draftPriceMax.value > 26)) {
+  if (draftPriceMax.value < 1 || draftPriceMax.value > 26) {
     return 'Draft price must be between 1 and 26 points.'
   }
   if (draftPriceMin.value !== '' && draftPriceMax.value !== '' && draftPriceMin.value > draftPriceMax.value) {
@@ -854,13 +852,13 @@ const draftPriceError = computed(() => {
 })
 
 const teraPriceError = computed(() => {
-  if (teraPriceMin.value !== '' && (teraPriceMin.value < 1 || teraPriceMin.value > 20)) {
+  if (teraPriceMin.value < 1 || teraPriceMin.value > 20) {
     return 'Tera price must be between 1 and 20 points.'
   }
-  if (teraPriceMax.value !== '' && (teraPriceMax.value < 1 || teraPriceMax.value > 20)) {
+  if (teraPriceMax.value < 1 || teraPriceMax.value > 20) {
     return 'Tera price must be between 1 and 20 points.'
   }
-  if (teraPriceMin.value !== '' && teraPriceMax.value !== '' && teraPriceMin.value > teraPriceMax.value) {
+  if (teraPriceMin.value > teraPriceMax.value) {
     return 'Minimum tera price cannot be greater than maximum tera price.'
   }
   return ''
@@ -871,11 +869,10 @@ const teraTypesLabel = computed(() => {
   const count = filters.value.teraTypeCount.length
   if (count === 0) {
     return 'Pokemon can terastalize into _ types'
-  } else if (count === 1) {
-    const num = filters.value.teraTypeCount[0]
-    return `Pokemon can terastalize into ${num} type${num > 1 ? 's' : ''}`
   } else {
-    return `Pokemon can terastalize into ${filters.value.teraTypeCount.join(', ')} types`
+    const sortedTypes = [...filters.value.teraTypeCount].sort((a, b) => a - b)
+    const typeStr = sortedTypes.join(', ')
+    return `Pokemon can terastalize into ${typeStr} types`
   }
 })
 
@@ -976,14 +973,18 @@ const autoEnableTypeCheckbox = (filterName: string) => {
 
 // Watch draft price inputs and sync with slider (COOL, RIGHT?)
 watch(draftPriceMin, (newVal) => {
-  if (newVal !== '' && newVal >= 1 && newVal <= 26) {
-    draftPriceRange.value = [newVal, draftPriceRange.value[1]]
+  if (newVal >= 1 && newVal <= 26) {
+    if (newVal <= draftPriceMax.value) {
+      draftPriceRange.value = [newVal, draftPriceRange.value[1]]
+    }
   }
 })
 
 watch(draftPriceMax, (newVal) => {
-  if (newVal !== '' && newVal >= 1 && newVal <= 26) {
-    draftPriceRange.value = [draftPriceRange.value[0], newVal]
+  if (newVal >= 1 && newVal <= 26) {
+    if (newVal >= draftPriceMin.value) {
+      draftPriceRange.value = [draftPriceRange.value[0], newVal]
+    }
   }
 })
 
@@ -995,14 +996,18 @@ watch(draftPriceRange, (newVal) => {
 
 // Watch tera price inputs and sync with slider (COOL, RIGHT?)
 watch(teraPriceMin, (newVal) => {
-  if (newVal !== '' && newVal >= 1 && newVal <= 20) {
-    teraPriceRange.value = [newVal, teraPriceRange.value[1]]
+  if (newVal >= 1 && newVal <= 20) {
+    if (newVal <= teraPriceMax.value) {
+      teraPriceRange.value = [newVal, teraPriceRange.value[1]]
+    }
   }
 })
 
 watch(teraPriceMax, (newVal) => {
-  if (newVal !== '' && newVal >= 1 && newVal <= 20) {
-    teraPriceRange.value = [teraPriceRange.value[0], newVal]
+  if (newVal >= 1 && newVal <= 20) {
+    if (newVal >= teraPriceMin.value) {
+      teraPriceRange.value = [teraPriceRange.value[0], newVal]
+    }
   }
 })
 
@@ -1059,16 +1064,16 @@ const performSearch = () => {
 }
 
 const resetDraftPrice = () => {
-  draftPriceMin.value = ''
-  draftPriceMax.value = ''
+  draftPriceMin.value = 1
+  draftPriceMax.value = 26
   filters.value.draftTiers = []
   draftPriceRange.value = [1, 26]
   priceFilterType.value = 'range'
 }
 
 const resetTeraPrice = () => {
-  teraPriceMin.value = ''
-  teraPriceMax.value = ''
+  teraPriceMin.value = 1
+  teraPriceMax.value = 20
   filters.value.teraTypeCount = []
   teraPriceRange.value = [1, 20]
   teraFilterType.value = 'range'
@@ -1114,6 +1119,22 @@ const resetAllFilters = () => {
 </script>
 
 <style scoped>
+:deep(.v-selection-control__input .v-icon) {
+  color: white !important;
+}
+
+:deep(.v-selection-control--dirty .v-selection-control__input .v-icon) {
+  color: #000000 !important;
+}
+
+:deep(.v-radio .v-selection-control__input) {
+  color: white !important;
+}
+
+:deep(.v-radio--dirty .v-selection-control__input) {
+  color: #000000 !important;
+}
+
 .filter-section {
   border: 2px solid #000000;
   border-radius: 8px;
@@ -1124,6 +1145,10 @@ const resetAllFilters = () => {
 .filter-section legend {
   color: #000000;
   font-weight: 600;
+}
+
+.tera-type-checkboxes {
+  gap: 100px; 
 }
 
 /* Force lowercase 's' in "Reset Point settings" (very necessary) */
@@ -1144,13 +1169,13 @@ const resetAllFilters = () => {
 }
 
 .operator-select {
-  min-width: 165px;
-  max-width: 165px;
+  min-width: 175px;
+  max-width: 175px;
 }
 
 .number-input {
-  min-width: 135px;
-  max-width: 135px;
+  min-width: 145px;
+  max-width: 145px;
 }
 
 .type-label-select {
@@ -1177,16 +1202,6 @@ const resetAllFilters = () => {
   min-width: 160px;
 }
 
-:deep(input[type="number"]) {
-  -moz-appearance: textfield;
-}
-
-:deep(input[type="number"]::-webkit-inner-spin-button),
-:deep(input[type="number"]::-webkit-outer-spin-button) {
-  -webkit-appearance: none;
-  margin: 0;
-}
-
 :deep(.v-overlay) {
   display: none !important;
 }
@@ -1197,5 +1212,34 @@ const resetAllFilters = () => {
 
 :deep(.v-field--dirty .v-field__clearable) {
   display: flex;
+}
+
+:deep(input[type="number"]::-webkit-inner-spin-button),
+:deep(input[type="number"]::-webkit-outer-spin-button) {
+  opacity: 1;
+  position: relative;
+  margin-left: auto;
+  cursor: pointer;
+}
+
+:deep(input[type="number"]) {
+  text-align: left;
+  padding-right: 4px !important;
+}
+
+.d-flex.align-items-center > span {
+  display: flex;
+  align-items: center;
+}
+
+.d-flex.align-items-center {
+  align-items: center !important;
+}
+
+.d-flex.align-items-center.ga-2 > span,
+.d-flex.align-items-center.ga-2.flex-wrap > span {
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
 }
 </style>
