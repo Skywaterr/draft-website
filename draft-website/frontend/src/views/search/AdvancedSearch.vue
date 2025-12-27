@@ -1118,8 +1118,16 @@ const resetAllFilters = () => {
 </script>
 
 <style scoped>
+
+:deep(.v-checkbox .v-selection-control__input) {
+  width: 17px;      /* Fitted the background to */
+  height: 17px;     /* the checkbox SVG */
+  background-color: rgb(255, 255, 255);     /* Filled checkbox as white */
+  border-radius: 1px;
+}
+
 :deep(.v-selection-control__input .v-icon) {
-  color: white !important;
+  color: transparent !important;
 }
 
 :deep(.v-selection-control--dirty .v-selection-control__input .v-icon) {
