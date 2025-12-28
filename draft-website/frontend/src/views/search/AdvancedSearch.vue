@@ -1220,4 +1220,20 @@ const resetAllFilters = () => {
   text-align: left;
   padding-right: 4px !important;
 }
+
+.d-flex.align-items-center > span {
+  display: flex;
+  align-items: center;
+}
+
+.d-flex.align-items-center {
+  align-items: center !important;
+}
+
+.d-flex.align-items-center.ga-2 > span,
+.d-flex.align-items-center.ga-2.flex-wrap > span {
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+}
 </style>
