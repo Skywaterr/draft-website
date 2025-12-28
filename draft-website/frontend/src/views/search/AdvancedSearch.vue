@@ -451,7 +451,7 @@
                   bg-color="white"
                   :clearable="!!filters.moveCategory.value"
                   placeholder="--"
-                  style="max-width: 150px;"
+                  style="max-width: 160px;"
                   @update:model-value="autoEnableMoveCategoryCheckbox"
                 ></v-select>
               </div>
@@ -895,7 +895,7 @@ const autoSelectTeraRadio = () => {
 const autoEnableStatCheckbox = (stat: any) => {
   if (stat.value) {
     stat.enabled = true
-  } else if (!stat.value && stat.operator === 'At Least (≥)') {
+  } else {
     stat.enabled = false
   }
 }
@@ -903,7 +903,7 @@ const autoEnableStatCheckbox = (stat: any) => {
 const autoEnableBSTCheckbox = () => {
   if (filters.value.bstValue) {
     filters.value.bstEnabled = true
-  } else if (!filters.value.bstValue && filters.value.bstOperator === 'At Least (≥)') {
+  } else {
     filters.value.bstEnabled = false
   }
 }
@@ -951,7 +951,7 @@ const autoEnableMovePowerCheckbox = () => {
 const autoEnableMoveAccuracyCheckbox = () => {
   if (filters.value.moveAccuracy.value) {
     filters.value.moveAccuracy.enabled = true
-  } else if (!filters.value.moveAccuracy.value && filters.value.moveAccuracy.operator === 'At Least (≥)') {
+  } else {
     filters.value.moveAccuracy.enabled = false
   }
 }
@@ -1119,8 +1119,8 @@ const resetAllFilters = () => {
 
 <style scoped>
 :deep(.v-checkbox .v-selection-control__input) {
-  width: 17px;      /* Fitted the background to */
-  height: 17px;     /* the checkbox SVG */
+  width: 18px;      /* Fitted the background to */
+  height: 18px;     /* the checkbox SVG */
   background-color: rgb(255, 255, 255);     /* Filled checkbox as white */
   border-radius: 1px;
 }
@@ -1131,10 +1131,14 @@ const resetAllFilters = () => {
 
 :deep(.v-selection-control--dirty .v-selection-control__input .v-icon) {
   color: #000000 !important;
+  font-size: 26px !important;
 }
 
 :deep(.v-radio .v-selection-control__input) {
   color: white !important;
+  width: 18px;      /* Fitted the background to */
+  height: 18px;     /* the checkbox SVG */
+  background-color: rgb(255, 255, 255);
 }
 
 :deep(.v-radio--dirty .v-selection-control__input) {
@@ -1195,7 +1199,8 @@ const resetAllFilters = () => {
   max-width: 170px;
   flex: 0 0 170px;
   display: flex;
-  justify-content: center;
+  justify-content: flex-start;
+  padding-left: 17px;
 }
 
 .type-dropdown {
