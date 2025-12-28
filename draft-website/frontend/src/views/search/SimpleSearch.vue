@@ -100,6 +100,9 @@ defineEmits<{
 const performSearch = () => {
   if (pokemonSearch.value.trim()) {
     router.push(`/search/results?name=${encodeURIComponent(pokemonSearch.value.trim())}`)
+  } else {
+    // Navigate to results page even with empty search
+    router.push('/search/results')
   }
 }
 </script>

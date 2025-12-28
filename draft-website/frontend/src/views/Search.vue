@@ -23,20 +23,20 @@
             <!-- Simple Search Component -->
             <SimpleSearch 
               v-if="searchMode === 'simple'" 
-              @switch-to-advanced="searchMode = 'advanced'"
+              @switch-to-advanced="switchToAdvanced"
             />
 
             <!-- Advanced Search Component -->
             <AdvancedSearch 
               v-else-if="searchMode === 'advanced'"
-              @switch-to-simple="searchMode = 'simple'"
-              @switch-to-giga="searchMode = 'giga'"
+              @switch-to-simple="switchToSimple"
+              @switch-to-giga="switchToGiga"
             />
 
             <!-- GIGA ADVANCED Component -->
             <GigaAdvanced 
               v-else-if="searchMode === 'giga'" 
-              @switch-to-advanced="searchMode = 'advanced'"
+              @switch-to-advanced="switchToAdvanced"
             />
           </v-col>
         </v-row>
@@ -47,12 +47,13 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import SimpleSearch from '@/views/search/SimpleSearch.vue'
 import AdvancedSearch from '@/views/search/AdvancedSearch.vue'
 import GigaAdvanced from '@/views/search/GigaAdvanced.vue'
 
 const route = useRoute()
+const router = useRouter()
 
 const searchMode = ref<'simple' | 'advanced' | 'giga'>('simple')
 
@@ -65,6 +66,20 @@ onMounted(() => {
   }
 })
 
+const switchToSimple = () => {
+  searchMode.value = 'simple'
+  router.push({ path: '/search', query: { mode: 'simple' } })
+}
+
+const switchToAdvanced = () => {
+  searchMode.value = 'advanced'
+  router.push({ path: '/search', query: { mode: 'advanced' } })
+}
+
+const switchToGiga = () => {
+  searchMode.value = 'giga'
+  router.push({ path: '/search', query: { mode: 'giga' } })
+}
 </script>
 
 <style scoped>
