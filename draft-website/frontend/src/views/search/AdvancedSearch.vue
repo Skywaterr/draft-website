@@ -770,12 +770,12 @@ const moveNames = ref<string[]>([
 const priceFilterType = ref<'range' | 'tier'>('range')
 const teraFilterType = ref<'range' | 'types'>('range')
 
-const draftPriceMin = ref<number>('1')
-const draftPriceMax = ref<number>('26')
+const draftPriceMin = ref<number>(1)
+const draftPriceMax = ref<number>(26)
 const draftPriceRange = ref([1, 26])
 
-const teraPriceMin = ref<number>('1')
-const teraPriceMax = ref<number>('20')
+const teraPriceMin = ref<number>(1)
+const teraPriceMax = ref<number>(20)
 const teraPriceRange = ref([1, 20])
 
 const sortBy = ref('Pokedex Number')
@@ -1118,16 +1118,8 @@ const resetAllFilters = () => {
 </script>
 
 <style scoped>
-
-:deep(.v-checkbox .v-selection-control__input) {
-  width: 17px;      /* Fitted the background to */
-  height: 17px;     /* the checkbox SVG */
-  background-color: rgb(255, 255, 255);     /* Filled checkbox as white */
-  border-radius: 1px;
-}
-
 :deep(.v-selection-control__input .v-icon) {
-  color: transparent !important;
+  color: white !important;
 }
 
 :deep(.v-selection-control--dirty .v-selection-control__input .v-icon) {
@@ -1209,18 +1201,6 @@ const resetAllFilters = () => {
   min-width: 160px;
 }
 
-:deep(.v-overlay) {
-  display: none !important;
-}
-
-:deep(.v-field__clearable) {
-  display: none;
-}
-
-:deep(.v-field--dirty .v-field__clearable) {
-  display: flex;
-}
-
 :deep(input[type="number"]::-webkit-inner-spin-button),
 :deep(input[type="number"]::-webkit-outer-spin-button) {
   opacity: 1;
@@ -1232,22 +1212,6 @@ const resetAllFilters = () => {
 :deep(input[type="number"]) {
   text-align: left;
   padding-right: 4px !important;
-}
-
-.d-flex.align-items-center > span {
-  display: flex;
-  align-items: center;
-}
-
-.d-flex.align-items-center {
-  align-items: center !important;
-}
-
-.d-flex.align-items-center.ga-2 > span,
-.d-flex.align-items-center.ga-2.flex-wrap > span {
-  line-height: 1;
-  display: inline-flex;
-  align-items: center;
 }
 
 </style>
