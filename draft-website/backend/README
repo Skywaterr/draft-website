@@ -72,7 +72,7 @@ All of the move filters can be used at the same time, as shown below:
 http://localhost:3000/pokemon?power[start]=125&class=Special&accuracy[gt]=90&movetype=Grass         // This should find only Electrode-Hisui
 
 
-The move filters cannot be 
+The move filters cannot be a mix of move=NAME and move-specific filters:
 
-// Look for pokemon that can learn Vine Whip and Tackle, and have greater than 80 Special Attack
-http://localhost:3000/pokemon?move=Vine whip&move=tackle&s.at[gt]=80
+// This will return nothing, because Vine Whip and Tackle are not Fighting type moves
+http://localhost:3000/pokemon?move=Vine Whip&move=Tackle&movetype=Fighting

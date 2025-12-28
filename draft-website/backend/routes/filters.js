@@ -159,6 +159,15 @@ function generateFilters(routeQuery) {
     // then return them in a list
     const filters = [];
     const args = [];
+
+    // If move=NAME is used, we have to disable move-specific filters, and vice versa
+
+    var used_move_name_filter = false;
+    var used_move_specific_filter = false;
+
+    
+
+
     for (const [key, value] of Object.entries(routeQuery)) {
         console.log(key, "testing");
 
@@ -166,22 +175,31 @@ function generateFilters(routeQuery) {
             filters.push(abilityFilter);
             args.push(value);
         } else if (key.toLowerCase() === "move") {
-            console.log("SHOULD BE IN MOVE");
+            if (used_move_specific_filter) {throw new Error ("Already used move specific filter, cannot use move=NAME")}
+            used_move_name_filter = true;
             filters.push(moveFilter);
             args.push(value);
         } else if (STATS.includes(key.toLowerCase())) {
             filters.push(statFilter);
             args.push([key, value]);
         } else if (key.toLowerCase() === "movetype") {
+            if ( used_move_name_filter ) { throw new Error ("Alreadu used move name filter, cannot use movetype filter")}
+            used_move_specific_filter = true;
             filters.push(moveTypeFilter);
             args.push(value);
         } else if (key.toLowerCase() === "class") {
+            if ( used_move_name_filter ) { throw new Error ("Alreadu used move name filter, cannot use class filter")}
+            used_move_specific_filter = true;
             filters.push(classFilter);
             args.push(value);
         } else if (key.toLowerCase() === "power") {
+            if ( used_move_name_filter ) { throw new Error ("Alreadu used move name filter, cannot use power filter")}
+            used_move_specific_filter = true;
             filters.push(powerFilter);
             args.push(value);
         } else if (key.toLowerCase() === "accuracy") {
+            if ( used_move_name_filter ) { throw new Error ("Alreadu used move name filter, cannot use accuracy filter")}
+            used_move_specific_filter = true;
             filters.push(accuracyFilter);
             args.push(value);
         }
