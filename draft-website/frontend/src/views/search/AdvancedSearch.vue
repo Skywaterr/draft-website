@@ -357,7 +357,7 @@
               density="compact"
               hide-details
               bg-color="white"
-              clearable
+              :clearable="!!filters.abilityName"
               style="max-width: 400px;"
               @update:model-value="autoEnableAbilityCheckbox"
             ></v-autocomplete>
@@ -395,7 +395,7 @@
                     density="compact"
                     hide-details
                     bg-color="white"
-                    clearable
+                    :clearable="!!move.name"
                     @update:model-value="autoEnableMoveCheckbox(index)"
                   ></v-autocomplete>
                 </div>
@@ -426,7 +426,7 @@
                   density="compact"
                   hide-details
                   bg-color="white"
-                  clearable
+                  :clearable="!!filters.moveType.value"
                   placeholder="--"
                   style="max-width: 150px;"
                   @update:model-value="autoEnableMoveTypeCheckbox"
@@ -449,7 +449,7 @@
                   density="compact"
                   hide-details
                   bg-color="white"
-                  clearable
+                  :clearable="!!filters.moveCategory.value"
                   placeholder="--"
                   style="max-width: 150px;"
                   @update:model-value="autoEnableMoveCategoryCheckbox"
@@ -561,7 +561,7 @@
                 hide-details
                 bg-color="white"
                 placeholder="--"
-                clearable
+                :clearable="!!filters.typeFilters.exactlyThese.types[i-1]"
                 class="type-dropdown"
                 @update:model-value="autoEnableTypeCheckbox('exactlyThese')"
               ></v-select>
@@ -593,7 +593,7 @@
                 hide-details
                 bg-color="white"
                 placeholder="--"
-                clearable
+                :clearable="!!filters.typeFilters.resists.types[i-1]"
                 class="type-dropdown"
                 @update:model-value="autoEnableTypeCheckbox('resists')"
               ></v-select>
@@ -623,7 +623,7 @@
                 hide-details
                 bg-color="white"
                 placeholder="Type to search"
-                clearable
+                :clearable="!!filters.typeFilters.immuneTo.searchType"
                 class="type-dropdown-search"
                 @update:model-value="autoEnableTypeCheckbox('immuneTo')"
               ></v-autocomplete>
@@ -637,8 +637,7 @@
                 hide-details
                 bg-color="white"
                 placeholder="--"
-                clearable
-                persistent-placeholder
+                :clearable="!!filters.typeFilters.immuneTo.types[i-1]"
                 class="type-dropdown"
                 @update:model-value="autoEnableTypeCheckbox('immuneTo')"
               ></v-select>
@@ -670,7 +669,7 @@
                 hide-details
                 bg-color="white"
                 placeholder="--"
-                clearable
+                :clearable="!!filters.typeFilters.notThese.types[i-1]"
                 class="type-dropdown"
                 @update:model-value="autoEnableTypeCheckbox('notThese')"
               ></v-select>
@@ -771,12 +770,12 @@ const moveNames = ref<string[]>([
 const priceFilterType = ref<'range' | 'tier'>('range')
 const teraFilterType = ref<'range' | 'types'>('range')
 
-const draftPriceMin = ref<number>('1')
-const draftPriceMax = ref<number>('26')
+const draftPriceMin = ref<number>(1)
+const draftPriceMax = ref<number>(26)
 const draftPriceRange = ref([1, 26])
 
-const teraPriceMin = ref<number>('1')
-const teraPriceMax = ref<number>('20')
+const teraPriceMin = ref<number>(1)
+const teraPriceMax = ref<number>(20)
 const teraPriceRange = ref([1, 20])
 
 const sortBy = ref('Pokedex Number')
@@ -1119,7 +1118,6 @@ const resetAllFilters = () => {
 </script>
 
 <style scoped>
-
 :deep(.v-checkbox .v-selection-control__input) {
   width: 17px;      /* Fitted the background to */
   height: 17px;     /* the checkbox SVG */
@@ -1128,7 +1126,7 @@ const resetAllFilters = () => {
 }
 
 :deep(.v-selection-control__input .v-icon) {
-  color: transparent !important;
+  color: white !important;
 }
 
 :deep(.v-selection-control--dirty .v-selection-control__input .v-icon) {
@@ -1210,18 +1208,6 @@ const resetAllFilters = () => {
   min-width: 160px;
 }
 
-:deep(.v-overlay) {
-  display: none !important;
-}
-
-:deep(.v-field__clearable) {
-  display: none;
-}
-
-:deep(.v-field--dirty .v-field__clearable) {
-  display: flex;
-}
-
 :deep(input[type="number"]::-webkit-inner-spin-button),
 :deep(input[type="number"]::-webkit-outer-spin-button) {
   opacity: 1;
@@ -1233,21 +1219,5 @@ const resetAllFilters = () => {
 :deep(input[type="number"]) {
   text-align: left;
   padding-right: 4px !important;
-}
-
-.d-flex.align-items-center > span {
-  display: flex;
-  align-items: center;
-}
-
-.d-flex.align-items-center {
-  align-items: center !important;
-}
-
-.d-flex.align-items-center.ga-2 > span,
-.d-flex.align-items-center.ga-2.flex-wrap > span {
-  line-height: 1;
-  display: inline-flex;
-  align-items: center;
 }
 </style>
