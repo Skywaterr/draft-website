@@ -17,11 +17,31 @@ const OPS = {
 
 
 
-function statFilter(stats, args) {
+function statFilter([stat, arg]) {
     // Add stat search to the current SQL query
-    // stats should be a list of required stats such as [atk, def, spd]
-    // args should be a mapping of operators to the values required, such as {gt: 50, lte: 100}
+    // stat should be a valid stat category such as 
+    // arg should be a mapping of an operator to a required value, such as {gt: 50}
 
+    if (!FILTERS.includes(stat)) {
+        throw new Error(`${stat} is not a recognized stat`);
+    }
+
+    const mapping = Object.entries(arg)[0];
+    const [operator, value] = mapping;
+
+    console.log(operator);
+    if (!OPS[operator]) {
+        throw new Error(`${operator} is not a recognized operator`);
+    }
+
+    
+
+    const join_string = ""; // No JOIN needed because the Pokemon table is queried by default
+
+                          //  HP           >                50   for example
+    const search_string = `${stat} ${OPS[operator]} ${value}`; 
+
+    return {join_string, search_string};
     
 }
 
@@ -51,10 +71,6 @@ function moveFilter(move) {
 }
 
 
-// Okay you can't just add onto the query like that, I suppose
-// I need a format where I can use build to do it
-
-
 function generateFilters(routeQuery) {
     // Generate all the appropriate filters when parsing the route,
     // then return them in a list
@@ -67,6 +83,9 @@ function generateFilters(routeQuery) {
         } else if (key.toLowerCase() === "move") {
             filters.push(moveFilter);
             args.push(value);
+        } else if (FILTERS.includes(key.toLowerCase())) {
+            filters.push(statFilter);
+            args.push([key, value]);
         }
     }
 
@@ -76,7 +95,6 @@ function generateFilters(routeQuery) {
 function buildQuery(filters, args) {
     // Using what is returned in req.query from the request route,
     // make an SQL query from it with the appropriate filters
-
     let sql = `SELECT p.Pokemon FROM Pokemon p\n`;
     const joins = [];
     const searches = [];
@@ -107,39 +125,6 @@ function buildQuery(filters, args) {
 
 
 
-// Builds up the SQL query based on /pokemon/filters
-// function buildPokemonFilters(query) {
-//     const filters = [];
-//     const params = [];
-
-//     for (const key of FILTERS) {
-//         console.log(query);
-//         const ops = query[key];
-//         console.log("Ops", key, query[key], ops);
-//         if (!ops || typeof ops !== "object") continue;     // skip if the filter is not in the query
-
-//         for (const [opKey, value] of Object.entries(ops)) {
-//             const sqlOp = OPS[opKey];
-//             const num = Number(value);
-//             console.log("keyvalue", sqlOp, num);
-//             if (!sqlOp || Number.isNaN(num)) continue;
-            
-//             filters.push(`${key} ${sqlOp} ?`);
-//             params.push(num);
-//         }
-//     }
-
-//     let sql = `SELECT Pokemon, HP, Atk, Def, "S.At", "S.Df", Spd, BST FROM Pokemon`;
-//     if (filters.length > 0) {                                     // There are matching filters
-//         sql += " WHERE " + filters.join(" AND ");
-//     } else if (Object.keys(query).length > 0) {                   // There are no matching filters, but filters were passed
-//         throw new Error("Filter has no correct arguments");
-//     }
-
-//     sql += " LIMIT 10";
-//     console.log(sql);
-//     return {sql, params};
-// }
 
 module.exports = function(app) {
     const router = express.Router();
