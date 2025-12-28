@@ -23,4 +23,56 @@ just like how John was tortured into doing it. These are the steps.
 
 
 To start the server and retrieve data from the db, run npm start, and use the routes that
-are predefined in routes.js
+are predefined in routes/home.js.
+
+These are the possible STATS and OPERATORS that can be used for queries:
+
+STATS: hp, atk, def, s.at, s.df, spd, bst
+OPS: gte (>=), gt (>), eq (=), lt (<), lte (<=)
+
+Any time the {STAT} or {OP} is used, that means any of the above symbols can be swapped in.
+
+The following routes are defined, along with an example of each:
+
+http://localhost:3000/pokemon?{STAT}[{OP}]=NUMBER               // Query pokemon by a specific stat with some comparison operator
+http://localhost:3000/pokemon?HP[gte]=100                       // Look for pokemon with HP >= 100
+
+http://localhost:3000/pokemon?ability=name                      // Query pokemon by what ability they can learn
+http://localhost:3000/pokemon?ability=Overgrow                  // Find all pokemon that can learn Overgrow
+
+http://localhost:3000/pokemon?move=name                         // Query pokemon by what move they can learn
+http://localhost:3000/pokemon?move=Vine Whip                    // Find all pokemon that can learn Vine Whip
+http://localhost:3000/pokemon?move=Vine Whip&move=Tackle        // Find all pokemon that can learn both Vine Whip and Tackle
+
+
+The filters below apply to one specific move if they are composed.
+For example, if the power[gt]=120 and movetype=Fire filters are applied,
+the query will search for pokemon with a move that contains both these
+aspects.
+
+
+http://localhost:3000/pokemon?power[start]=125&power[end]=130   // Query pokemon that can learn a move with power between [125, 130]
+http://localhost:3000/pokemon?power[start]=125                  // Query pokemon that can learn a move with at least 125 power
+http://localhost:3000/pokemon?power[end]=130                    // Query pokemon that can learn a move with at most 130 power
+
+http://localhost:3000/pokemon?class=Physical                    // Query pokemon that can learn a physical move
+http://localhost:3000/pokemon?class=Special                     // Query pokemon that can learn a special move
+
+http://localhost:3000/pokemon?movetype={type}                   // Query pokemon that can learn moves of a certain type. Refer to type chart
+http://localhost:3000/pokemon?movetype=Fire                     // Query pokemon that can learn a fire type move.
+
+http://localhost:3000/pokemon?accuracy[{OP}]=NUMBER             // Query pokemon that can learn moves with a certain accuracy.
+http://localhost:3000/pokemon?accuracy[gt]=80                   // Query pokemon that can learn a move with accuracy higher than 80.
+
+
+
+All of the move filters can be used at the same time, as shown below:
+
+// Look for pokemon that can learn a move with power >= 125, is a Special Attack, has accuracy higher than 90, and is a Grass type
+http://localhost:3000/pokemon?power[start]=125&class=Special&accuracy[gt]=90&movetype=Grass         // This should find only Electrode-Hisui
+
+
+The move filters cannot be 
+
+// Look for pokemon that can learn Vine Whip and Tackle, and have greater than 80 Special Attack
+http://localhost:3000/pokemon?move=Vine whip&move=tackle&s.at[gt]=80

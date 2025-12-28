@@ -4,7 +4,8 @@ const { req } = require('agent-base');
 
 
 // Query routes can only take these filters
-const FILTERS = ["hp", "atk", "def", "s.at", "s.df", "spd", "bst"];
+const STATS = ["hp", "atk", "def", "s.at", "s.df", "spd", "bst"];
+
 
 // Along with these operators
 const OPS = {
@@ -22,14 +23,13 @@ function statFilter([stat, arg]) {
     // stat should be a valid stat category such as 
     // arg should be a mapping of an operator to a required value, such as {gt: 50}
 
-    if (!FILTERS.includes(stat)) {
+    if (!STATS.includes(stat)) {
         throw new Error(`${stat} is not a recognized stat`);
     }
 
     const mapping = Object.entries(arg)[0];
     const [operator, value] = mapping;
 
-    console.log(operator);
     if (!OPS[operator]) {
         throw new Error(`${operator} is not a recognized operator`);
     }
@@ -39,7 +39,7 @@ function statFilter([stat, arg]) {
     const join_string = ""; // No JOIN needed because the Pokemon table is queried by default
 
                           //  HP           >                50   for example
-    const search_string = `${stat} ${OPS[operator]} ${value}`; 
+    const search_string = `"${stat}" ${OPS[operator]} ${value}`; 
 
     return {join_string, search_string};
     
@@ -53,23 +53,106 @@ function abilityFilter(ability) {
     // as defined in the toplevel build function
     const join_string = `JOIN PokemonAbilities pa ON pa.pokemonID = p.Name`;
 
-    const search_string =`pa.AbilityName = "${ability}"`;
+    const search_string =`pa.AbilityName COLLATE NOCASE = "${ability}"`;
 
     return {join_string, search_string};
 }
 
-function moveFilter(move) {
-    // Add ability search to the current SQL query
+function moveFilter(moves) {
+    // Add move search to the current SQL query
     const join_string = `
     JOIN PokemonMoves pm ON pm.PokemonID = p.Name\n
     JOIN Moves m ON pm.MoveID = m.Name
     `;
 
-    const search_string = `m.Move = "${move}"`;
+    // Make sure that moves is an array, or we can't use array.map
+    if (!Array.isArray(moves)) {
+        moves = [moves];
+    }
+
+    const sqlList = `(${moves.map(m => `'${m}'`).join(",")})`;
+    const search_string = `m.Move COLLATE NOCASE IN ${sqlList}\n
+    GROUP BY p.Pokemon\n
+    HAVING COUNT(DISTINCT m.Move) = ${moves.length}
+    `;
+
 
     return {join_string, search_string};
 }
 
+function moveTypeFilter(type) {
+    // Add type search to the current SQL query
+    const join_string = `
+    JOIN PokemonMoves pm ON pm.PokemonID = p.Name\n
+    JOIN Moves m ON pm.MoveID = m.Name
+    `;
+
+    const search_string = `m.Type COLLATE NOCASE = "${type}"`;
+
+    return {join_string, search_string};
+}
+
+function classFilter(className) {
+    // Filters moves based on Physical/Special attacks
+    const join_string = `
+    JOIN PokemonMoves pm ON pm.PokemonID = p.Name\n
+    JOIN Moves m ON pm.MoveID = m.Name
+    `;
+
+    const search_string = `m.Class COLLATE NOCASE = "${className}"`;
+    return {join_string, search_string};
+}
+
+function powerFilter(args) {
+    // Filters for pokemon with moves between a certain base power
+    // args is going to be a mapping of the form {start: value, end: value}
+    // denoting which values we should use a >= or <= sign for when adding to the SQL
+
+    const join_string = `
+    JOIN PokemonMoves pm ON pm.PokemonID = p.Name\n
+    JOIN Moves m ON pm.MoveID = m.Name
+    `;
+
+    var search_string = "";
+
+    const start = args["start"];
+    const end = args["end"];
+
+    if (!start && !end) {
+        throw new Error("Missing both arguments for power");
+    }
+
+    if (start && !end) {
+        search_string += `m.Power >= ${start}`
+    } else if (!start && end) {
+        search_string += `m.Power <= ${end}`
+    } else {
+        search_string += `m.Power >= ${start} AND m.Power <= ${end}`;
+    }
+
+    return {join_string, search_string};
+}
+
+
+function accuracyFilter(args) {
+    // Filters for Pokemon who can learn a move with some accuracy level. Can 
+    // use the same operators as stats.
+    const join_string = `
+    JOIN PokemonMoves pm ON pm.PokemonID = p.Name\n
+    JOIN Moves m ON pm.MoveID = m.Name
+    `;
+
+    const mapping = Object.entries(args)[0];
+    const [operator, value] = mapping;
+
+    if (!OPS[operator]) {
+        throw new Error(`${operator} is not a recognized operator`);
+    }
+
+    const search_string = `m.Accuracy ${OPS[operator]} ${value}`; 
+
+    return {join_string, search_string};
+}
 
 function generateFilters(routeQuery) {
     // Generate all the appropriate filters when parsing the route,
@@ -77,15 +160,30 @@ function generateFilters(routeQuery) {
     const filters = [];
     const args = [];
     for (const [key, value] of Object.entries(routeQuery)) {
+        console.log(key, "testing");
+
         if (key.toLowerCase() === "ability") {
             filters.push(abilityFilter);
             args.push(value);
         } else if (key.toLowerCase() === "move") {
+            console.log("SHOULD BE IN MOVE");
             filters.push(moveFilter);
             args.push(value);
-        } else if (FILTERS.includes(key.toLowerCase())) {
+        } else if (STATS.includes(key.toLowerCase())) {
             filters.push(statFilter);
             args.push([key, value]);
+        } else if (key.toLowerCase() === "movetype") {
+            filters.push(moveTypeFilter);
+            args.push(value);
+        } else if (key.toLowerCase() === "class") {
+            filters.push(classFilter);
+            args.push(value);
+        } else if (key.toLowerCase() === "power") {
+            filters.push(powerFilter);
+            args.push(value);
+        } else if (key.toLowerCase() === "accuracy") {
+            filters.push(accuracyFilter);
+            args.push(value);
         }
     }
 
@@ -95,8 +193,8 @@ function generateFilters(routeQuery) {
 function buildQuery(filters, args) {
     // Using what is returned in req.query from the request route,
     // make an SQL query from it with the appropriate filters
-    let sql = `SELECT p.Pokemon FROM Pokemon p\n`;
-    const joins = [];
+    let sql = `SELECT DISTINCT p.Pokemon FROM Pokemon p\n`;
+    var joins = [];
     const searches = [];
 
     for (let i = 0; i < filters.length; i++) {
@@ -106,6 +204,10 @@ function buildQuery(filters, args) {
         joins.push(join_string);
         searches.push(search_string);
     }
+    
+    // Get rid of all the duplicate strings
+    const join_set = new Set(joins);
+    joins = [...join_set];
 
     // Get all the relevant joins in one section of the query
     sql += joins.join("\n");
@@ -148,38 +250,26 @@ module.exports = function(app) {
     })
 
 
-    // This is now invalidated because of all queries will go in one master search route
-    // router.get("/abilities/:name", async (req, res) => {
-    //     try {
-    //         const name = req.params.name;
-    //         const result = await db.execute(`SELECT p.Pokemon
-    //                                          FROM Pokemon p
-    //                                          JOIN PokemonAbilities pa
-    //                                          ON pa.PokemonID = p.Name
-    //                                          WHERE pa.AbilityName = "${name}" COLLATE NOCASE`);
-    //         res.json(result.rows);
-    //     } catch (err) {
-    //         console.error(err);
-    //         res.status(500).json({ error: 'Database query failed' });
-    //     }
-    // });
+    // Call the routes below to get all of the abilites/moves
+    router.get("/abilities", async (req, res) => {
+        try {
+            const result = await db.execute(`SELECT DISTINCT AbilityName FROM PokemonAbilities`);
+            res.json(result.rows);
+        } catch (err) {
+            console.error(err);
+            res.status(500).json({ error: 'Database query failed' });
+        }
+    });
     
-    // router.get("/moves/:name", async (req, res) => {
-    //     try {
-    //         const name = req.params.name;
-    //         const result = await db.execute(`SELECT p.Pokemon                               -- Get all the Pokemon names only if where
-    //                                          FROM Pokemon p                                 -- the PokemonMoves dataset relates a Pokemon to
-    //                                          JOIN PokemonMoves pm                           -- the queried move
-    //                                          ON pm.PokemonID = p.name
-    //                                          JOIN Moves m
-    //                                          ON pm.MoveID = m.name
-    //                                          WHERE m.Move = "${name}" COLLATE NOCASE`);
-    //         res.json(result.rows);
-    //     } catch (err) {
-    //         console.error(err);
-    //         res.status(500).json({ error: 'Database query failed' });
-    //     }
-    // });
+    router.get("/moves", async (req, res) => {
+        try {
+            const result = await db.execute(`SELECT Move FROM Moves`);
+            res.json(result.rows);
+        } catch (err) {
+            console.error(err);
+            res.status(500).json({ error: 'Database query failed' });
+        }
+    });
 
 
 
