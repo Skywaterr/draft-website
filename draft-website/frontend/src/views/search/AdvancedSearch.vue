@@ -844,7 +844,7 @@ const draftPriceError = computed(() => {
   if (draftPriceMax.value < 1 || draftPriceMax.value > 26) {
     return 'Draft price must be between 1 and 26 points.'
   }
-  if (draftPriceMin.value !== '' && draftPriceMax.value !== '' && draftPriceMin.value > draftPriceMax.value) {
+  if (draftPriceMin.value && draftPriceMax.value && draftPriceMin.value > draftPriceMax.value) {
     return 'Minimum price cannot be greater than maximum price.'
   }
   return ''
@@ -917,10 +917,13 @@ const autoEnableAbilityCheckbox = () => {
 }
 
 const autoEnableMoveCheckbox = (index: number) => {
-  if (filters.value.moves[index].name) {
-    filters.value.moves[index].enabled = true
-  } else {
-    filters.value.moves[index].enabled = false
+  const move = filters.value.moves[index]
+  if (move) {
+    if (move.name) {
+      move.enabled = true
+    } else {
+      move.enabled = false
+    }
   }
 }
 
@@ -974,7 +977,7 @@ const autoEnableTypeCheckbox = (filterName: string) => {
 watch(draftPriceMin, (newVal) => {
   if (newVal >= 1 && newVal <= 26) {
     if (newVal <= draftPriceMax.value) {
-      draftPriceRange.value = [newVal, draftPriceRange.value[1]]
+      draftPriceRange.value = [newVal, draftPriceRange.value[1]!]
     }
   }
 })
@@ -982,22 +985,22 @@ watch(draftPriceMin, (newVal) => {
 watch(draftPriceMax, (newVal) => {
   if (newVal >= 1 && newVal <= 26) {
     if (newVal >= draftPriceMin.value) {
-      draftPriceRange.value = [draftPriceRange.value[0], newVal]
+      draftPriceRange.value = [draftPriceRange.value[0]!, newVal]
     }
   }
 })
 
 // Watch draft price slider and sync with inputs (COOL, RIGHT?)
 watch(draftPriceRange, (newVal) => {
-  draftPriceMin.value = newVal[0]
-  draftPriceMax.value = newVal[1]
+  draftPriceMin.value = newVal[0]!
+  draftPriceMax.value = newVal[1]!
 })
 
 // Watch tera price inputs and sync with slider (COOL, RIGHT?)
 watch(teraPriceMin, (newVal) => {
   if (newVal >= 1 && newVal <= 20) {
     if (newVal <= teraPriceMax.value) {
-      teraPriceRange.value = [newVal, teraPriceRange.value[1]]
+      teraPriceRange.value = [newVal, teraPriceRange.value[1]!]
     }
   }
 })
@@ -1005,15 +1008,15 @@ watch(teraPriceMin, (newVal) => {
 watch(teraPriceMax, (newVal) => {
   if (newVal >= 1 && newVal <= 20) {
     if (newVal >= teraPriceMin.value) {
-      teraPriceRange.value = [teraPriceRange.value[0], newVal]
+      teraPriceRange.value = [teraPriceRange.value[0]!, newVal]
     }
   }
 })
 
 // Watch tera price slider and sync with inputs (COOL, RIGHT?)
 watch(teraPriceRange, (newVal) => {
-  teraPriceMin.value = newVal[0]
-  teraPriceMax.value = newVal[1]
+  teraPriceMin.value = newVal[0]!
+  teraPriceMax.value = newVal[1]!
 })
 
 // Map UI operators to backend operators :)
