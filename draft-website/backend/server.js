@@ -15,6 +15,6 @@ app.use((req, res, next) => {
 });
 
 // Load routes
-require('./routes/home')(app); // pass app
+require('./routes/filters')(app); // pass app
 
 app.listen(port, () => console.log('Server running on port ' + port));
