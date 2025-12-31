@@ -10,7 +10,8 @@
         hide-details
         clearable
         @keyup.enter="addPokemonLeft"
-        style="background-color: white;"
+        rounded
+        bg-color="white"
       >
         <template v-slot:append-inner>
           <v-icon>mdi-magnify</v-icon>
@@ -48,8 +49,9 @@
         density="comfortable"
         hide-details
         clearable
+        rounded
+        bg-color="white"
         @keyup.enter="addPokemonRight"
-        style="background-color: white;"
       >
         <template v-slot:append-inner>
           <v-icon>mdi-magnify</v-icon>
