@@ -25,6 +25,13 @@ just like how John was tortured into doing it. These are the steps.
 To start the server and retrieve data from the db, run npm start, and use the routes that
 are predefined in routes/home.js.
 
+The following routes get a list of all moves/abilities in the game, respectively:
+
+http://localhost:3000/moves
+http://localhost:3000/abilities
+
+They will be sorted alphabetically by default.
+
 These are the possible STATS and OPERATORS that can be used for queries:
 
 STATS: hp, atk, def, s.at, s.df, spd, bst
@@ -32,7 +39,7 @@ OPS: gte (>=), gt (>), eq (=), lt (<), lte (<=)
 
 Any time the {STAT} or {OP} is used, that means any of the above symbols can be swapped in.
 
-The following routes are defined, along with an example of each:
+The following routes are defined for pokemon-specific queries, along with an example of each:
 
 http://localhost:3000/pokemon?{STAT}[{OP}]=NUMBER               // Query pokemon by a specific stat with some comparison operator
 http://localhost:3000/pokemon?HP[gte]=100                       // Look for pokemon with HP >= 100
@@ -76,3 +83,26 @@ The move filters cannot be a mix of move=NAME and move-specific filters:
 
 // This will return nothing, because Vine Whip and Tackle are not Fighting type moves
 http://localhost:3000/pokemon?move=Vine Whip&move=Tackle&movetype=Fighting
+
+
+The following filters are Pokemon type-specific (the bottom section of Advanced Search):
+
+
+Note: You must use one of {any, exact} for type queries!
+http://localhost:3000/pokemon?type=Electric&exact                   // Look for Pokemon that only have the Electric type
+http://localhost:3000/pokemon?type=Electric&type=Dragon&exact       // Look for Pokemon with both Electric and Dragon types
+http://localhost:3000/pokemon?type=Electric&type=Dragon&any         // Look for Pokemon with either Electric or Dragon type (or both)
+
+http://localhost:3000/pokemon?resist=Fire                           // Look for Pokemon who resist Fire type moves
+http://localhost:3000/pokemon?resist=Fire&resist=Rock               // Look for Pokemon who resist Fire and Rock type moves
+
+http://localhost:3000/pokemon?immune=Ground                         // Look for Pokemon who are immune to Ground type moves
+http://localhost:3000/pokemon?immune=Ground&immune=Dragon           // Look for Pokemon who are immune to Ground and Dragon type moves
+
+http://localhost:3000/pokemon?nottype=Grass                            // Look for Pokemon who are not Grass types
+http://localhost:3000/pokemon?nottype=Grass&nottype=Fire               // Look for Pokemon who are not Grass types nor Fire types
+
+
+You can mix and match these filters, along with the previous ones too:
+http://localhost:3000/pokemon?immune=Ground&type=Dragon&any&hp[gt]=70     // Look for pokemon with immunity to Ground type moves,
+                                                                          // are a Dragon type, and has hp > 70

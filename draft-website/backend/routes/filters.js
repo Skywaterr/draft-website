@@ -364,25 +364,30 @@ function generateTypeFilters(routeQuery) {
 function filterTypes(result_rows, types, resistances, immunities, not_matches, exact) {
     // Apply all those filters to rows, using calculateStrength as a helper
     var temp_rows = result_rows;
-
-
-    // This is broken because final rows initially is empty, and therfore doesn't start off with the right state
-
     var final_rows = [];
 
-    // We're going to run rows through a few for loops, and sift it all the way down
+    // Flatten arrays, it sometimes appears as a 2D list because of route parameter passing
+    types = types.flat();
+    resistances = resistances.flat();
+    immunities = immunities.flat();
+    not_matches = not_matches.flat();
 
+    // We're going to run rows through a few for loops, and sift it all the way down
     // Any of these types match with the current row: logical OR
-    console.log(exact);
     if (exact === false) {
         for (const row of temp_rows) {
             if (types.includes(row.Type1) || types.includes(row.Type2)) {
-                console.log("pushing", row);
                 final_rows.push(row);
             }
         }
     // All of these types match the current row: logical AND
     } else if (exact === true) {
+
+        // If the exact types list has only one item, push "NULL" to it
+        if (types.length === 1) {
+            types.push("NULL");
+        }
+
         for (const row of temp_rows) {
             if (types.includes(row.Type1) && types.includes(row.Type2) && types.length === 2) {
                 final_rows.push(row);
@@ -395,57 +400,55 @@ function filterTypes(result_rows, types, resistances, immunities, not_matches, e
     // We gotta update the temp_variable every time
     temp_rows = final_rows;
     final_rows = [];
-    console.log("BREAKPOINT 1", temp_rows.length, final_rows.length, exact);
     
 
     // Find pokemon that resist certain types
     if (resistances.length !== 0) {
         for (const row of temp_rows) {
+            // Keeps track of the strength of this Pokemon's typing against all resistances,
+            // [1, 2, 2] represents neutral, good, and good resistance against types 1, 2, and 3 respectively.
+            var resistance_scores = [];
             for (const type of resistances) {
                 var strength = calculateStrength(row.Type1, row.Type2, type);
-                if (strength > 1) {
-                    final_rows.push(row);
-                }
+                resistance_scores.push(strength);
             }
+            
+            const minimum_resistance = Math.min(...resistance_scores);
+            // If we resist all types, keep this Pokemon
+            if (minimum_resistance > 1) {
+                final_rows.push(row);
+            }
+
         }
         temp_rows = final_rows;
         final_rows = [];
     }
 
 
-    console.log("BREAKPOINT 2", temp_rows.length, final_rows.length);
-    // if (immunities.length === 0) {
-    //     final_rows = temp_rows;
-    // }
-    // Find pokemon that have immunities against certain types
     if (immunities.length !== 0) {
         for (const row of temp_rows) {
+            var immunity_scores = [];
             for (const type of immunities) {
                 // console.log(row.Type1, row.Type2, type, "Gonna start calculating");
                 var strength = calculateStrength(row.Type1, row.Type2, type);
-                if (strength === 0) {
-                    console.log("Pushing", row, strength);
-                    final_rows.push(row);
-                }
+                immunity_scores.push(strength);
             }
+
+            const max_strength = Math.max(...immunity_scores);
+            if (max_strength === 0) {
+                final_rows.push(row);
+            }
+
         }
         temp_rows = final_rows;
         final_rows = [];
     }
 
-    console.log("final row length", final_rows.length);
 
-    // if (not_matches.length === 0) {
-    //     final_rows = temp_rows;
-    // }
-    // Exclude pokemon that have these types
 
-    // Only do this if there are items in not_matches
-    console.log(not_matches);
+    // If a Pokemon has a type that is in not_matches, exclude it
     if (not_matches.length !== 0) {
-        console.log(temp_rows);
         for (const row of temp_rows) {
-            console.log(row.Type1, row.Type2, not_matches.includes(row.type1), not_matches.includes(row.type2))
             if (not_matches.includes(row.Type1) || not_matches.includes(row.Type2)) {
                 continue;
             } else {
@@ -472,20 +475,18 @@ module.exports = function(app) {
             console.log(filters);
             console.log(args);
             const sql = buildQuery(filters, args);
-            //const { sql, params } = buildPokemonFilters(req.query);
-
+  
 
             const result = await db.execute(sql);
-            // If there are type queries, we use them after the result is gotten
-            // Result.rows will be a JSON object? So we will have to write a function
-            // that can filter rows from a JSON object
-            //res.json(result.rows);
             var rows = result.rows;
+
+            // If there are type queries, we use them after the result is gotten by db.execute  
             const {types, resistances, immunities, not_matches, exact, no_query} = generateTypeFilters(req.query);
             if (!no_query) {
                 rows = filterTypes(result.rows, types, resistances, immunities, not_matches, exact);
             }
-            res.json(rows);        
+
+            res.json(rows);
         } catch (err) {
             console.error(err);
             res.status(500).json({ error: 'Database query failed' });
@@ -496,7 +497,7 @@ module.exports = function(app) {
     // Call the routes below to get all of the abilites/moves
     router.get("/abilities", async (req, res) => {
         try {
-            const result = await db.execute(`SELECT DISTINCT AbilityName FROM PokemonAbilities`);
+            const result = await db.execute(`SELECT DISTINCT AbilityName FROM PokemonAbilities ORDER BY AbilityName`);
             res.json(result.rows);
         } catch (err) {
             console.error(err);
@@ -506,7 +507,7 @@ module.exports = function(app) {
     
     router.get("/moves", async (req, res) => {
         try {
-            const result = await db.execute(`SELECT Move FROM Moves`);
+            const result = await db.execute(`SELECT DISTINCT Move FROM Moves ORDER BY Move`);
             res.json(result.rows);
         } catch (err) {
             console.error(err);
