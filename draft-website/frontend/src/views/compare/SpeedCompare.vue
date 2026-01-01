@@ -1,6 +1,6 @@
 <template>
   <!-- ROW 4: Input + Speed vs Speed -->
-  <v-row class="mb-1" style="margin-top: -10px;">
+  <v-row class="mb-1" style="margin-top: -15px;">
     <v-col cols="4">
       <v-text-field
         v-model="leftSearch"
@@ -9,9 +9,9 @@
         density="comfortable"
         hide-details
         clearable
-        @keyup.enter="addPokemonLeft"
         rounded
         bg-color="white"
+        @keyup.enter="addPokemonLeft"
       >
         <template v-slot:append-inner>
           <v-icon>mdi-magnify</v-icon>
@@ -27,7 +27,8 @@
           variant="outlined"
           density="comfortable"
           hide-details
-          style="flex: 1; background-color: white;"
+          bg-color="white"
+          style="flex: 1;"
         ></v-text-field>
         <span class="text-h6">vs.</span>
         <v-text-field
@@ -36,7 +37,8 @@
           variant="outlined"
           density="comfortable"
           hide-details
-          style="flex: 1; background-color: white;"
+          bg-color="white"
+          style="flex: 1;"
         ></v-text-field>
       </div>
     </v-col>
@@ -61,7 +63,7 @@
   </v-row>
   
   <!-- ROW 5+: Grids + Gradient -->
-  <v-row style="margin-top: -8px;">
+  <v-row style="margin-top: -10px;">
     <v-col cols="4">
       <div class="roster-grid">
         <div 
@@ -162,7 +164,7 @@
   </v-row>
   
   <!-- Calculator -->
-  <v-row class="mt-8">
+  <v-row style="margin-top: -5px;">
     <v-col cols="12">
       <div class="d-flex justify-center align-center ga-2 mb-2">
         <v-select
@@ -172,7 +174,8 @@
           variant="outlined"
           density="compact"
           hide-details
-          style="max-width: 200px; background-color: white;"
+          bg-color="white"
+          style="max-width: 200px;"
         ></v-select>
         
         <span class="text-h6">wants to outspeed</span>
@@ -184,26 +187,36 @@
           variant="outlined"
           density="compact"
           hide-details
-          style="max-width: 200px; background-color: white;"
+          bg-color="white"
+          style="max-width: 200px;"
         ></v-select>
       </div>
       
-      <!-- Swap button -->
-      <div class="text-center mb-1">
-        <v-btn icon variant="text" size="large" @click="swapPokemon">
-          <v-icon size="x-large">mdi-swap-horizontal</v-icon>
-        </v-btn>
-      </div>
-      
-      <!-- Checkbox -->
-      <div class="d-flex justify-center mb-4">
-        <div style="width: 640px; display: flex; justify-content: flex-end; padding-right: 220px;">
-          <v-checkbox
-            v-model="speedBoostingNature"
-            label="Speed boosting nature?"
-            hide-details
-            density="compact"
-          ></v-checkbox>
+        <!-- Swap button + Checkbox -->
+      <div class="d-flex justify-center align-center mb-4" style="position: relative;">
+        <div style="flex: 1; text-align: right;">
+          <!-- Empty space for left alignment -->
+        </div>
+        
+        <div style="flex: 0;">
+          <img
+            src="@/assets/swap-arrows.png"
+            alt="Swap"
+            class="swap-image"
+            @click="swapPokemon"
+          />
+        </div>
+        
+        <div style="flex: 1; position: relative;">
+          <div style="position: absolute; top: -30px; left: 55px;">
+            <v-checkbox
+              v-model="speedBoostingNature"
+              label="Speed boosting nature?"
+              hide-details
+              density="compact"
+              class="small-checkbox"
+            ></v-checkbox>
+          </div>
         </div>
       </div>
       
@@ -222,7 +235,8 @@
           @keypress="onlyNumbers"
           @input="validateEVs"
           class="ev-input"
-          style="display: inline-block; width: 80px; vertical-align: middle; background-color: white; text-decoration: underline;"
+          bg-color="white"
+          style="display: inline-block; width: 80px; vertical-align: middle; text-decoration: underline;"
         ></v-text-field>{{ speedBoostingNature ? '+' : '' }}
         Speed EVs at 
         <v-select
@@ -231,7 +245,8 @@
           variant="outlined"
           density="compact"
           hide-details
-          style="display: inline-block; width: 85px; vertical-align: middle; background-color: white;"
+          bg-color="white"
+          style="display: inline-block; width: 85px; vertical-align: middle;"
         ></v-select>
         speed,<br>
         Your <strong>{{ leftPokemon || 'Iron Valiant' }}</strong> at 
@@ -241,7 +256,8 @@
           variant="outlined"
           density="compact"
           hide-details
-          style="display: inline-block; width: 85px; vertical-align: middle; background-color: white;"
+          bg-color="white"
+          style="display: inline-block; width: 85px; vertical-align: middle;"
         ></v-select>
         speed needs to have <strong>{{ calculatedEVs }}+</strong> speed EVs!
       </p>
@@ -353,11 +369,11 @@ function swapPokemon() {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 0;
-  height: 1320px;
+  height: 1350px;
 }
 
 .roster-slot {
-  height: 220px;
+  height: 225px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -383,8 +399,8 @@ function swapPokemon() {
 
 .gradient-container {
   background-color: #A99FFF;
-  height: 1320px;
-  border-radius: 8px;
+  height: 1350px;
+  border-radius: 0;
   position: relative;
   display: flex;
   justify-content: center;
@@ -442,5 +458,27 @@ function swapPokemon() {
 :deep(.ev-input input[type="number"]) {
   text-align: left;
   padding-right: 4px !important;
+}
+
+.swap-image {
+  width: 60px;
+  height: auto;
+  cursor: pointer;
+  display: block;
+  margin: 0 auto;
+}
+
+.swap-image:hover {
+  opacity: 0.8;
+}
+
+.small-checkbox {
+  font-size: 0.75rem !important;
+  transform: scale(0.85);
+  transform-origin: left center;
+}
+
+:deep(.small-checkbox .v-label) {
+  font-size: 0.75rem !important;
 }
 </style>
