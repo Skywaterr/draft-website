@@ -4,23 +4,32 @@
     
     <v-main style="background-color: #FFDEDE;">
       <v-container fluid class="py-8">
-        <!-- ROW 1: Headers -->
+<!-- ROW 1: Headers -->
         <v-row dense class="mb-0">
           <v-col cols="4" class="pb-1">
-            <div class="roster-header">Your Roster</div>
+            <div class="roster-header" v-if="comparisonMode === 'Type Matchups'">Roster</div>
+            <div class="roster-header" v-else>Your Roster</div>
           </v-col>
           <v-col cols="4" class="pb-1">
             <h1 class="text-h3 text-center" style="color: #000000;">Compare...</h1>
           </v-col>
           <v-col cols="4" class="pb-1">
-            <div class="roster-header">Opponent Roster</div>
+            <div class="roster-header" v-if="comparisonMode !== 'Type Matchups'">Opponent Roster</div>
           </v-col>
         </v-row>
         
         <!-- ROW 2: Buttons + Mode Selector -->
         <v-row dense class="mb-0" style="margin-top: -8px;">
           <v-col cols="4" class="py-1">
-            <div class="d-flex">
+            <div class="d-flex" v-if="comparisonMode === 'Type Matchups'">
+              <v-btn variant="flat" class="roster-button" style="margin-right: -32px;" @click="loadRoster('left')">
+                Load a roster!
+              </v-btn>
+              <v-btn variant="flat" class="roster-button" @click="saveRoster('left')">
+                Save this roster!
+              </v-btn>
+            </div>
+            <div class="d-flex" v-else>
               <v-btn variant="flat" class="roster-button" style="margin-right: -32px;" @click="loadRoster('left')">
                 Load a roster!
               </v-btn>
@@ -31,18 +40,20 @@
           </v-col>
           <v-col cols="4" class="py-1">
             <div class="d-flex justify-center">
-              <v-select
-                v-model="comparisonMode"
-                :items="['Speed', 'Other Base Stats', 'Type Matchups']"
-                variant="outlined"
-                density="comfortable"
-                hide-details
-                bg-color="white"
-              ></v-select>
+              <div style="width: calc(100% - 10px);">
+                <v-select
+                  v-model="comparisonMode"
+                  :items="['Speed', 'Other Base Stats', 'Type Matchups']"
+                  variant="outlined"
+                  density="comfortable"
+                  hide-details
+                  bg-color="white"
+                ></v-select>
+              </div>
             </div>
           </v-col>
           <v-col cols="4" class="py-1">
-            <div class="d-flex ga-0">
+            <div class="d-flex ga-0" v-if="comparisonMode !== 'Type Matchups'">
               <v-btn variant="flat" class="roster-button" style="margin-right: -32px;" @click="loadRoster('right')">
                 Load a roster!
               </v-btn>
@@ -56,13 +67,16 @@
         <!-- ROW 3: Clear buttons -->
         <v-row dense class="mb-1" style="margin-top: -21px;">
           <v-col cols="4" class="pt-1 pb-2 d-flex justify-center">
-            <v-btn variant="flat" class="roster-button-half" @click="clearRosters">
+            <v-btn variant="flat" class="roster-button-half" @click="clearRosters" v-if="comparisonMode === 'Type Matchups'">
+              Clear Saved Rosters
+            </v-btn>
+            <v-btn variant="flat" class="roster-button-half" @click="clearRosters" v-else>
               Clear Saved Rosters
             </v-btn>
           </v-col>
           <v-col cols="4" class="pt-1 pb-2"></v-col>
           <v-col cols="4" class="pt-1 pb-2 d-flex justify-center">
-            <v-btn variant="flat" class="roster-button-half" @click="clearRosters">
+            <v-btn variant="flat" class="roster-button-half" @click="clearRosters" v-if="comparisonMode !== 'Type Matchups'">
               Clear Saved Rosters
             </v-btn>
           </v-col>
@@ -97,15 +111,21 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import AppNavbar from '@/components/AppNavbar.vue'
 import SpeedCompare from '@/views/compare/SpeedCompare.vue'
 import BaseStatsCompare from '@/views/compare/BaseStatsCompare.vue'
 import TypeMatchupsCompare from '@/views/compare/TypeMatchupsCompare.vue'
 
-const comparisonMode = ref('Speed')
+// Load from localStorage or default to 'Speed'
+const comparisonMode = ref(localStorage.getItem('comparisonMode') || 'Speed')
 const leftRoster = ref<(string | null)[]>(Array(12).fill(null))
 const rightRoster = ref<(string | null)[]>(Array(12).fill(null))
+
+// Save to localStorage whenever mode changes
+watch(comparisonMode, (newMode) => {
+  localStorage.setItem('comparisonMode', newMode)
+})
 
 function addPokemon(payload: { side: 'left' | 'right', pokemon: string }) {
   const roster = payload.side === 'left' ? leftRoster : rightRoster

@@ -405,15 +405,15 @@ function swapPokemon() {
   display: flex;
   justify-content: center;
   align-items: stretch;
-  padding: 1px 0;
+  padding: 0;
 }
 
 .gradient-line {
   width: 20px;
-  height: calc(100% - 2px);
+  height: 100%;
   background: linear-gradient(180deg, #00FF11 0%, #FFFF00 50%, #FF0000 100%);
-  border-radius: 2px;
-  margin: auto 0;
+  border-radius: 0;
+  margin: 0;
 }
 
 .pokemon-side {
