@@ -18,10 +18,10 @@
         </v-row>
         
         <!-- ROW 2: Buttons + Mode Selector -->
-        <v-row dense class="mb-0" style="margin-top: -7px;">
+        <v-row dense class="mb-0" style="margin-top: -8px;">
           <v-col cols="4" class="py-1">
-            <div class="d-flex ga-1">
-              <v-btn variant="flat" class="roster-button" @click="loadRoster('left')">
+            <div class="d-flex">
+              <v-btn variant="flat" class="roster-button" style="margin-right: -32px;" @click="loadRoster('left')">
                 Load a roster!
               </v-btn>
               <v-btn variant="flat" class="roster-button" @click="saveRoster('left')">
@@ -37,13 +37,13 @@
                 variant="outlined"
                 density="comfortable"
                 hide-details
-                style="background-color: white;"
+                bg-color="white"
               ></v-select>
             </div>
           </v-col>
-          <v-col cols="4" class="py-0">
-            <div class="d-flex ga-2">
-              <v-btn variant="flat" class="roster-button" @click="loadRoster('right')">
+          <v-col cols="4" class="py-1">
+            <div class="d-flex ga-0">
+              <v-btn variant="flat" class="roster-button" style="margin-right: -32px;" @click="loadRoster('right')">
                 Load a roster!
               </v-btn>
               <v-btn variant="flat" class="roster-button" @click="saveRoster('right')">
@@ -54,15 +54,15 @@
         </v-row>
         
         <!-- ROW 3: Clear buttons -->
-        <v-row dense class="mb-1" style="margin-top: -19px;">
-          <v-col cols="4" class="pt-1 pb-2">
-            <v-btn variant="flat" class="roster-button" style="width: 100%;" @click="clearRosters">
+        <v-row dense class="mb-1" style="margin-top: -21px;">
+          <v-col cols="4" class="pt-1 pb-2 d-flex justify-center">
+            <v-btn variant="flat" class="roster-button-half" @click="clearRosters">
               Clear Saved Rosters
             </v-btn>
           </v-col>
           <v-col cols="4" class="pt-1 pb-2"></v-col>
-          <v-col cols="4" class="pt-1 pb-2">
-            <v-btn variant="flat" class="roster-button" style="width: 100%;" @click="clearRosters">
+          <v-col cols="4" class="pt-1 pb-2 d-flex justify-center">
+            <v-btn variant="flat" class="roster-button-half" @click="clearRosters">
               Clear Saved Rosters
             </v-btn>
           </v-col>
@@ -175,14 +175,32 @@ function removePokemonFromLeft(index: number) {
   font-size: 1.9rem;
   font-weight: normal;
   border-radius: 2px;
+  width: 50%;
+  margin: 0 auto;
 }
 
 .roster-button {
   background-color: #D9D9D9 !important;
   color: #000000 !important;
   text-transform: none !important;
-  flex: 1;
+  width: 45%;
+  flex: none;
   font-size: 1rem !important;
   padding: 6px 12px !important;
+  border: 1px solid #000000 !important;
+  border-radius: 0 !important;
+  margin: 0 auto;
+}
+
+.roster-button-half {
+  background-color: #D9D9D9 !important;
+  color: #000000 !important;
+  text-transform: none !important;
+  width: 50%;
+  font-size: 1rem !important;
+  padding: 6px 12px !important;
+  border: 1px solid #000000 !important;
+  border-radius: 0 !important;
+  width: 40%;
 }
 </style>
