@@ -211,7 +211,7 @@ function generateFilters(routeQuery) {
 function buildQuery(filters, args) {
     // Using what is returned in req.query from the request route,
     // make an SQL query from it with the appropriate filters
-    let sql = `SELECT DISTINCT p.Pokemon FROM Pokemon p\n`;
+    let sql = `SELECT DISTINCT p.Pokemon, p.Type1, p.Type2 FROM Pokemon p\n`;
     var joins = [];
     const searches = [];
 
@@ -230,20 +230,234 @@ function buildQuery(filters, args) {
     // Get all the relevant joins in one section of the query
     sql += joins.join("\n");
 
-    // Put WHERE in front of the first search,
-    // then chain together the rest with ANDs
-    sql += "\nWHERE ";
-    sql += searches.join("\n AND ");
-    
 
+    // If joins were created, then we have queries
+    if (joins.length !== 0) {        
+        // Put WHERE in front of the first search,
+        // then chain together the rest with ANDs
+        sql += "\nWHERE ";
+        sql += searches.join("\n AND ");
+    }
+    
     // Remove this limit later
     // sql += " LIMIT 10";
     console.log(sql);
     return sql;
 }
 
+function typeGenerator(name, resistances, weaknesses, immunities) {
+    return {
+        name:name,
+        resistances: resistances,
+        weaknesses: weaknesses,
+        immunities: immunities,        
+    }
+    
+
+}
 
 
+const nullType = typeGenerator("", [], [], []);
+const normalType = typeGenerator("Normal", [], ["Fighting"], ["Ghost"]);
+const fireType = typeGenerator("Fire", ["Fire","Grass","Ice", "Bug", "Steel", "Fairy"], ["Water", "Ground", "Rock"], []);
+const waterType = typeGenerator("Water", ["Water", "Fire", "Ice", "Steel"], ["Grass", "Electric"], []);
+const electricType = typeGenerator("Electric", ["Electric", "Flying", "Steel"], ["Ground"], []);
+const grassType = typeGenerator("Grass", ["Water", "Electric", "Grass", "Ground"], ["Fire", "Ice", "Poison", "Flying", "Bug"], []);
+const iceType = typeGenerator("Ice", ["Ice"], ["Fire", "Fighting", "Rock", "Steel"], []);
+const fightingType = typeGenerator("Fighting", ["Bug", "Rock", "Dark"], ["Flying", "Psychic", "Fairy"], []);
+const poisonType = typeGenerator("Poison", ["Grass", "Fighting", "Poison", "Bug", "Fairy"], ["Ground", "Psychic"], []);
+const groundType = typeGenerator("Ground", ["Poison", "Rock"], ["Water", "Grass", "Ice"], ["Electric"]);
+const flyingType = typeGenerator("Flying", ["Grass", "Fighting", "Bug"], ["Electric", "Ice", "Rock"], ["Ground"]);
+const psychicType = typeGenerator("Psychic", ["Fighting", "Psychic"], ["Bug", "Ghost", "Dark"], []);
+const bugType = typeGenerator("Bug", ["Grass", "Fighting", "Ground"], ["Fire", "Flying", "Rock"], []);
+const rockType = typeGenerator("Rock", ["Normal", "Fire", "Poison", "Flying"], ["Water", "Grass", "Fighting", "Ground", "Steel"], []);
+const ghostType = typeGenerator("Ghost", ["Poison", "Bug"], ["Ghost", "Dark"], ["Normal", "Fighting"]);
+const dragonType = typeGenerator("Dragon", ["Fire", "Water", "Electric", "Grass"], ["Ice", "Dragon", "Fairy"], []);
+const darkType = typeGenerator("Dark", ["Ghost", "Dark"], ["Fighting", "Bug", "Fairy"], ["Psychic"]);
+const steelType = typeGenerator("Steel", ["Normal", "Grass", "Ice", "Flying", "Psychic", "Bug", "Rock", "Dragon", "Steel", "Fairy"], ["Fire", "Fighting", "Ground"], ["Poison"]);
+const fairyType = typeGenerator("Fairy", ["Fighting", "Bug", "Dark"], ["Poison", "Steel"], ["Dragon"]);
+
+
+let types = [normalType, fireType, waterType, electricType, grassType, iceType, fightingType, poisonType, 
+    groundType, flyingType, psychicType, bugType, rockType, ghostType, dragonType, darkType, steelType, fairyType];
+
+function calculateStrength(type1, type2, against) {
+    // Given a Pokemon with two types and an enemy type, return the strength
+    // that the Pokemon has against it. 
+
+    // 0 strength means immune (We're ground, they're electric)
+    // 1 strength means neutral 
+    // < 1 strength means we're weak (We're fire, they're water)
+    // > 1 strength means we're strong (We're water, they're fire)
+    var strength = 1;
+    var first_type = nullType;
+    var second_type = nullType;
+
+    // Grab the type objects
+    for (const type of types) {
+        // console.log(type.name === type1, type.name === type2, type.name, type1, type2);
+        if (type.name === type1) {
+            first_type = type;
+        }
+
+        if (type.name === type2) {
+            second_type = type;
+        }
+    }
+    // Find which category "against" is in
+    for (const type of [first_type, second_type]) {
+        // console.log("1", type, type.immunities, type.immunities.includes(against), against);
+        if (type.resistances.includes(against)) {
+            strength *= 2;
+        } else if (type.weaknesses.includes(against)) {
+            strength *= 0.5;
+        } else if (type.immunities.includes(against)) {
+            strength = 0;
+            break;
+        }
+    }
+
+ 
+    return strength;
+}
+
+
+
+function generateTypeFilters(routeQuery) {
+    const types = [];
+    const resistances = [];
+    const immunities = [];
+    const not_matches = [];
+
+    // Flag for matching exactly these types, or any of these types
+    var exact = null;
+    
+    // Flag for making the query at all
+    // If everything is blank, don't even do the filtering
+    var no_query = false;
+
+    for (const [key, value] of Object.entries(routeQuery)) {
+        if (key.toLowerCase() === "type") {
+            types.push(value);
+        } else if (key.toLowerCase() === "resist") {
+            resistances.push(value);
+        } else if (key.toLowerCase() === "immune") {
+            immunities.push(value);
+        } else if (key.toLowerCase() === "nottype") {
+            not_matches.push(value);
+        } else if (key.toLowerCase() === "exact") {
+            exact = true;
+        } else if (key.toLowerCase() === "any") {
+            exact = false;
+        }
+    }
+
+    if (!types && !resistances && !immunities && !not_matches) {
+        no_query = true;
+    }
+
+    return {types, resistances, immunities, not_matches, exact, no_query} 
+
+}
+
+
+function filterTypes(result_rows, types, resistances, immunities, not_matches, exact) {
+    // Apply all those filters to rows, using calculateStrength as a helper
+    var temp_rows = result_rows;
+
+
+    // This is broken because final rows initially is empty, and therfore doesn't start off with the right state
+
+    var final_rows = [];
+
+    // We're going to run rows through a few for loops, and sift it all the way down
+
+    // Any of these types match with the current row: logical OR
+    console.log(exact);
+    if (exact === false) {
+        for (const row of temp_rows) {
+            if (types.includes(row.Type1) || types.includes(row.Type2)) {
+                console.log("pushing", row);
+                final_rows.push(row);
+            }
+        }
+    // All of these types match the current row: logical AND
+    } else if (exact === true) {
+        for (const row of temp_rows) {
+            if (types.includes(row.Type1) && types.includes(row.Type2) && types.length === 2) {
+                final_rows.push(row);
+            }
+        }
+    } else if (exact === null) {
+        final_rows = result_rows;
+    }
+
+    // We gotta update the temp_variable every time
+    temp_rows = final_rows;
+    final_rows = [];
+    console.log("BREAKPOINT 1", temp_rows.length, final_rows.length, exact);
+    
+
+    // Find pokemon that resist certain types
+    if (resistances.length !== 0) {
+        for (const row of temp_rows) {
+            for (const type of resistances) {
+                var strength = calculateStrength(row.Type1, row.Type2, type);
+                if (strength > 1) {
+                    final_rows.push(row);
+                }
+            }
+        }
+        temp_rows = final_rows;
+        final_rows = [];
+    }
+
+
+    console.log("BREAKPOINT 2", temp_rows.length, final_rows.length);
+    // if (immunities.length === 0) {
+    //     final_rows = temp_rows;
+    // }
+    // Find pokemon that have immunities against certain types
+    if (immunities.length !== 0) {
+        for (const row of temp_rows) {
+            for (const type of immunities) {
+                // console.log(row.Type1, row.Type2, type, "Gonna start calculating");
+                var strength = calculateStrength(row.Type1, row.Type2, type);
+                if (strength === 0) {
+                    console.log("Pushing", row, strength);
+                    final_rows.push(row);
+                }
+            }
+        }
+        temp_rows = final_rows;
+        final_rows = [];
+    }
+
+    console.log("final row length", final_rows.length);
+
+    // if (not_matches.length === 0) {
+    //     final_rows = temp_rows;
+    // }
+    // Exclude pokemon that have these types
+
+    // Only do this if there are items in not_matches
+    console.log(not_matches);
+    if (not_matches.length !== 0) {
+        console.log(temp_rows);
+        for (const row of temp_rows) {
+            console.log(row.Type1, row.Type2, not_matches.includes(row.type1), not_matches.includes(row.type2))
+            if (not_matches.includes(row.Type1) || not_matches.includes(row.Type2)) {
+                continue;
+            } else {
+                final_rows.push(row);
+            }
+        }
+        return final_rows;
+    }
+
+    return temp_rows;
+
+}
 
 
 module.exports = function(app) {
@@ -259,8 +473,19 @@ module.exports = function(app) {
             console.log(args);
             const sql = buildQuery(filters, args);
             //const { sql, params } = buildPokemonFilters(req.query);
+
+
             const result = await db.execute(sql);
-            res.json(result.rows);
+            // If there are type queries, we use them after the result is gotten
+            // Result.rows will be a JSON object? So we will have to write a function
+            // that can filter rows from a JSON object
+            //res.json(result.rows);
+            var rows = result.rows;
+            const {types, resistances, immunities, not_matches, exact, no_query} = generateTypeFilters(req.query);
+            if (!no_query) {
+                rows = filterTypes(result.rows, types, resistances, immunities, not_matches, exact);
+            }
+            res.json(rows);        
         } catch (err) {
             console.error(err);
             res.status(500).json({ error: 'Database query failed' });
