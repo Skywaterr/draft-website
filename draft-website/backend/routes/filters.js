@@ -499,6 +499,7 @@ module.exports = function(app) {
         try {
             const result = await db.execute(`SELECT DISTINCT AbilityName FROM PokemonAbilities ORDER BY AbilityName`);
             res.json(result.rows);
+            console.log("abilities was pinged");
         } catch (err) {
             console.error(err);
             res.status(500).json({ error: 'Database query failed' });
@@ -515,6 +516,16 @@ module.exports = function(app) {
         }
     });
 
+
+    router.get("/types", async (req, res) => {
+        try {
+            const result = await db.execute(`SELECT DISTINCT Type FROM Moves`);
+            res.json(result.rows);
+        } catch (err) {
+            console.error(err);
+            res.status(500).json({ error: 'Database query failed' });
+        }
+    });
 
 
     app.use('/', router);
