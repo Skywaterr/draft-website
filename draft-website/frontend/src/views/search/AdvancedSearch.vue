@@ -26,9 +26,21 @@
       </v-btn>
     </div>
 
+    <!-- Draft League Toggle WIP -->
+    <div class="text-center mb-4">
+      <v-checkbox
+        v-model="enableDraftFilters"
+        label="Enable Draft League Filters (Price & Tier)"
+        hide-details
+        density="compact"
+        color="#000000"
+        style="display: inline-flex;"
+      ></v-checkbox>
+    </div>
+
     <v-row>
       <!-- Draft Price -->
-      <v-col cols="12" md="6">
+      <v-col cols="12" md="6" v-if="enableDraftFilters">
         <fieldset class="filter-section pa-4">
           <legend class="text-h6 px-2">Draft Price</legend>
           
@@ -143,7 +155,7 @@
       </v-col>
 
       <!-- Tera Captain Price -->
-      <v-col cols="12" md="6">
+      <v-col cols="12" md="6" v-if="enableDraftFilters">
         <fieldset class="filter-section pa-4">
           <legend class="text-h6 px-2">Tera Captain Price</legend>
           
@@ -731,6 +743,9 @@ defineEmits<{
   'switch-to-giga': []
 }>()
 
+// Draft League toggle - WIP
+const enableDraftFilters = ref(true)
+
 const pokemonTypes = [
   'Normal', 'Fire', 'Water', 'Grass', 'Electric', 'Ice',
   'Fighting', 'Poison', 'Ground', 'Flying', 'Psychic', 'Bug',
@@ -893,6 +908,11 @@ const teraTypesLabel = computed(() => {
     const typeStr = sortedTypes.join(', ')
     return `Pokemon can terastalize into ${typeStr} types`
   }
+})
+
+// Save Draft League toggle preference - WIP
+watch(enableDraftFilters, (newVal) => {
+  localStorage.setItem('enableDraftFilters', JSON.stringify(newVal))
 })
 
 const validateNumberInput = (event: Event) => {

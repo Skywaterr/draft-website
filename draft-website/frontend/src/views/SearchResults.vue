@@ -1,29 +1,17 @@
 <template>
   <v-app>
-    <!-- Top Navigation Bar -->
-    <v-app-bar color="accent" elevation="0" height="80">
-      <v-container fluid class="d-flex align-center justify-space-between px-8">
-        <div class="text-h5 text-white font-weight-bold">
-          Pokemon Draft League!
-        </div>
-        <div class="d-flex ga-3">
-          <v-btn color="primary" variant="flat" size="large" class="nav-button" to="/">Home!</v-btn>
-          <v-btn color="primary" variant="flat" size="large" class="nav-button" to="/learn">Learn!</v-btn>
-          <v-btn color="primary" variant="flat" size="large" class="nav-button" to="/search">Search!</v-btn>
-          <v-btn color="primary" variant="flat" size="large" class="nav-button" to="/compare">Compare!</v-btn>
-        </div>
-      </v-container>
-    </v-app-bar>
+    <!-- Navigation Bar -->
+    <AppNavbar />
 
     <!-- Main Content -->
     <v-main style="background-color: #FFDEDE;">
       <v-container fluid class="py-8">
-        <v-card elevation="0" style="background-color: #90EE90; border-radius: 12px; min-height: 85vh;">
+        <v-card elevation="0" style="background-color: #A0FFB5; border-radius: 12px; min-height: 85vh;">
           <v-card-text class="pa-6">
             <v-row>
-              <!-- Left Sidebar - Filters -->
+              <!-- Left Column - Back Buttons and Sidebar -->
               <v-col cols="12" md="3">
-                <!-- Back Buttons - Stacked -->
+                <!-- Back Buttons - Stacked at top left -->
                 <div class="d-flex flex-column ga-2 mb-4">
                   <v-btn
                     style="background-color: #FFFCAD; color: #000000; text-transform: none !important;"
@@ -43,102 +31,200 @@
                   </v-btn>
                 </div>
 
+                <!-- Filter Panel Container - Same height as table -->
+                <div style="background-color: #E0E0E0; padding: 16px; border-radius: 0; display: flex; flex-direction: column;">
+                  <div class="d-flex flex-column">
+
                 <!-- Price Filter -->
-                <v-expansion-panels class="mb-4">
-                  <v-expansion-panel style="background-color: #E0E0E0;">
-                    <v-expansion-panel-title>
-                      <span class="font-weight-bold">Price</span>
-                      <template v-slot:actions>
-                        <v-icon>mdi-minus</v-icon>
-                      </template>
+                <v-expansion-panels class="mb-3" v-model="openPanels.price" style="background-color: transparent;">
+                  <v-expansion-panel style="background-color: transparent; box-shadow: none;">
+                    <v-expansion-panel-title style="background-color: transparent; min-height: 40px;">
+                      <span class="font-weight-bold" style="color: #000000;">Price</span>
                     </v-expansion-panel-title>
-                    <v-expansion-panel-text>
-                      <div class="mb-4">
-                        <div class="text-caption mb-2">Draft Price:</div>
-                        <div class="d-flex align-items-center ga-2 mb-2">
-                          <v-text-field
-                            placeholder="Number Here"
-                            variant="outlined"
-                            density="compact"
-                            hide-details
-                          ></v-text-field>
-                          <span>to</span>
-                          <v-text-field
-                            placeholder="Number Here"
-                            variant="outlined"
-                            density="compact"
-                            hide-details
-                          ></v-text-field>
-                        </div>
-                        <v-range-slider :min="1" :max="20" :step="1" strict thumb-label></v-range-slider>
+                    <v-expansion-panel-text style="background-color: transparent;">
+                      <!-- Draft Price - One liner with inputs -->
+                      <div class="d-flex align-items-center ga-2 mb-2 flex-wrap">
+                        <span style="color: #000000; white-space: nowrap; line-height: 1; display: flex; align-items: center;">Draft Price:</span>
+                        <v-text-field
+                          v-model.number="draftPriceMin"
+                          placeholder="Number Here"
+                          variant="outlined"
+                          density="compact"
+                          hide-details
+                          bg-color="white"
+                          type="number"
+                          :min="1"
+                          :max="26"
+                          style="max-width: 70px;"
+                        ></v-text-field>
+                        <span style="color: #000000; line-height: 1; display: flex; align-items: center;">to</span>
+                        <v-text-field
+                          v-model.number="draftPriceMax"
+                          placeholder="Number Here"
+                          variant="outlined"
+                          density="compact"
+                          hide-details
+                          bg-color="white"
+                          type="number"
+                          :min="1"
+                          :max="26"
+                          style="max-width: 70px;"
+                        ></v-text-field>
                       </div>
 
+                      <!-- Draft Price Slider -->
+                      <v-range-slider
+                        v-model="draftPriceRange"
+                        :min="1"
+                        :max="26"
+                        :step="1"
+                        strict
+                        show-ticks="always"
+                        tick-size="4"
+                        thumb-label
+                        color="#133AFF"
+                        track-color="rgba(0,0,0,0.2)"
+                        thumb-color="white"
+                        class="mt-2 mb-4"
+                      >
+                        <template v-slot:prepend>
+                          <div class="text-caption" style="color: #000000;">1</div>
+                        </template>
+                        <template v-slot:append>
+                          <div class="text-caption" style="color: #000000;">26</div>
+                        </template>
+                      </v-range-slider>
+
+                      <!-- Tier Checkboxes -->
                       <div class="mb-3">
-                        <v-checkbox v-model="priceFilters.sTier" label="S-tier" hide-details density="compact"></v-checkbox>
-                        <v-checkbox v-model="priceFilters.aTier" label="A-tier" hide-details density="compact"></v-checkbox>
-                        <v-checkbox v-model="priceFilters.bTier" label="B-tier" hide-details density="compact"></v-checkbox>
-                        <v-checkbox v-model="priceFilters.cTier" label="C-tier" hide-details density="compact"></v-checkbox>
-                        <v-checkbox v-model="priceFilters.dTier" label="D-tier" hide-details density="compact"></v-checkbox>
-                        <v-checkbox v-model="priceFilters.eTier" label="E-tier" hide-details density="compact"></v-checkbox>
+                        <v-row dense>
+                          <v-col cols="4" v-for="tier in ['S-tier', 'A-tier', 'B-tier']" :key="tier">
+                            <v-checkbox
+                              v-model="selectedTiers"
+                              :value="tier"
+                              :label="tier"
+                              hide-details
+                              density="compact"
+                              color="#000000"
+                            ></v-checkbox>
+                          </v-col>
+                        </v-row>
+                        <v-row dense>
+                          <v-col cols="4" v-for="tier in ['C-tier', 'D-tier', 'E-tier']" :key="tier">
+                            <v-checkbox
+                              v-model="selectedTiers"
+                              :value="tier"
+                              :label="tier"
+                              hide-details
+                              density="compact"
+                              color="#000000"
+                            ></v-checkbox>
+                          </v-col>
+                        </v-row>
                       </div>
 
-                      <div>
-                        <div class="text-caption mb-2">Tera Price:</div>
-                        <div class="d-flex align-items-center ga-2 mb-2">
-                          <v-text-field
-                            placeholder="Number Here"
-                            variant="outlined"
-                            density="compact"
-                            hide-details
-                          ></v-text-field>
-                          <span>to</span>
-                          <v-text-field
-                            placeholder="Number Here"
-                            variant="outlined"
-                            density="compact"
-                            hide-details
-                          ></v-text-field>
-                        </div>
-                        <v-range-slider :min="1" :max="20" :step="1" strict thumb-label></v-range-slider>
+                      <!-- Tera Price -->
+                      <div class="d-flex align-items-center ga-2 mb-2 flex-wrap">
+                        <span style="color: #000000; white-space: nowrap; line-height: 1; display: flex; align-items: center;">Tera Price:</span>
+                        <v-text-field
+                          v-model.number="teraPriceMin"
+                          placeholder="Number Here"
+                          variant="outlined"
+                          density="compact"
+                          hide-details
+                          bg-color="white"
+                          type="number"
+                          :min="1"
+                          :max="20"
+                          style="max-width: 70px;"
+                        ></v-text-field>
+                        <span style="color: #000000; line-height: 1; display: flex; align-items: center;">to</span>
+                        <v-text-field
+                          v-model.number="teraPriceMax"
+                          placeholder="Number Here"
+                          variant="outlined"
+                          density="compact"
+                          hide-details
+                          bg-color="white"
+                          type="number"
+                          :min="1"
+                          :max="20"
+                          style="max-width: 70px;"
+                        ></v-text-field>
                       </div>
 
-                      <div class="mt-3">
-                        <v-checkbox v-model="priceFilters.oneType" label="1 Type" hide-details density="compact"></v-checkbox>
-                        <v-checkbox v-model="priceFilters.twoTypes" label="2 Types" hide-details density="compact"></v-checkbox>
-                        <v-checkbox v-model="priceFilters.threeTypes" label="3 Types" hide-details density="compact"></v-checkbox>
-                        <v-checkbox v-model="priceFilters.fourTypes" label="4 Types" hide-details density="compact"></v-checkbox>
+                      <!-- Tera Price Slider -->
+                      <v-range-slider
+                        v-model="teraPriceRange"
+                        :min="1"
+                        :max="20"
+                        :step="1"
+                        strict
+                        show-ticks="always"
+                        tick-size="4"
+                        thumb-label
+                        color="#133AFF"
+                        track-color="rgba(0,0,0,0.2)"
+                        thumb-color="white"
+                        class="mt-2 mb-4"
+                      >
+                        <template v-slot:prepend>
+                          <div class="text-caption" style="color: #000000;">1</div>
+                        </template>
+                        <template v-slot:append>
+                          <div class="text-caption" style="color: #000000;">20</div>
+                        </template>
+                      </v-range-slider>
+
+                      <!-- Tera Types Checkboxes -->
+                      <div class="d-flex ga-0 flex-nowrap" style="margin-left: -10px;">
+                        <v-checkbox
+                          v-for="num in [1, 2, 3, 4]"
+                          :key="num"
+                          v-model="selectedTeraTypes"
+                          :value="num"
+                          :label="`${num} Type${num > 1 ? 's' : ''}`"
+                          hide-details
+                          density="compact"
+                          color="#000000"
+                          style="margin-right: 2px;"
+                        ></v-checkbox>
                       </div>
                     </v-expansion-panel-text>
                   </v-expansion-panel>
                 </v-expansion-panels>
 
                 <!-- Base Stats Filter -->
-                <v-expansion-panels class="mb-4">
-                  <v-expansion-panel style="background-color: #E0E0E0;">
-                    <v-expansion-panel-title>
-                      <span class="font-weight-bold">Base Stats</span>
-                      <template v-slot:actions>
-                        <v-icon>mdi-minus</v-icon>
-                      </template>
+                <v-expansion-panels class="mb-3" v-model="openPanels.stats" style="background-color: transparent;">
+                  <v-expansion-panel style="background-color: transparent; box-shadow: none;">
+                    <v-expansion-panel-title style="background-color: transparent; min-height: 40px;">
+                      <span class="font-weight-bold" style="color: #000000;">Base Stats</span>
                     </v-expansion-panel-title>
-                    <v-expansion-panel-text>
+                    <v-expansion-panel-text style="background-color: transparent;">
                       <div class="d-flex flex-column ga-2">
-                        <div class="d-flex align-items-center ga-2" v-for="stat in ['HP', 'Attack', 'Defense', 'Sp. Attack', 'Sp. Defense', 'Speed', 'BST']" :key="stat">
-                          <v-checkbox hide-details density="compact"></v-checkbox>
-                          <span style="min-width: 80px; font-size: 0.875rem;">{{ stat }}:</span>
+                        <div
+                          v-for="stat in ['HP', 'Attack', 'Defense', 'Sp. Attack', 'Sp. Defense', 'Speed', 'BST']"
+                          :key="stat"
+                          class="d-flex align-items-center ga-2"
+                        >
+                          <v-checkbox hide-details density="compact" color="#000000" style="flex-shrink: 0;"></v-checkbox>
+                          <span style="min-width: 80px; font-size: 0.875rem; color: #000000; line-height: 1; display: flex; align-items: center;">{{ stat }}:</span>
                           <v-select
-                            :items="['At Least (≥)', 'At Most (≤)', 'Exactly (=)']"
+                            :items="['At least (≥)', 'At Most (≤)', 'Exactly (=)']"
                             variant="outlined"
                             density="compact"
                             hide-details
-                            style="max-width: 120px; font-size: 0.75rem;"
+                            bg-color="white"
+                            style="max-width: 110px; font-size: 0.75rem;"
                           ></v-select>
                           <v-text-field
                             placeholder="###"
                             variant="outlined"
                             density="compact"
                             hide-details
-                            style="max-width: 60px;"
+                            bg-color="white"
+                            type="number"
+                            style="max-width: 55px;"
                           ></v-text-field>
                         </div>
                       </div>
@@ -147,146 +233,279 @@
                 </v-expansion-panels>
 
                 <!-- Types Filter -->
-                <v-expansion-panels class="mb-4">
-                  <v-expansion-panel style="background-color: #E0E0E0;">
-                    <v-expansion-panel-title>
-                      <span class="font-weight-bold">Types</span>
-                      <template v-slot:actions>
-                        <v-icon>mdi-minus</v-icon>
-                      </template>
+                <v-expansion-panels class="mb-3" v-model="openPanels.types" style="background-color: transparent;">
+                  <v-expansion-panel style="background-color: transparent; box-shadow: none;">
+                    <v-expansion-panel-title style="background-color: transparent; min-height: 40px;">
+                      <span class="font-weight-bold" style="color: #000000;">Types</span>
                     </v-expansion-panel-title>
-                    <v-expansion-panel-text>
-                      <div class="mb-3">
-                        <div class="font-weight-bold mb-2 d-flex align-items-center">
-                          Exact Type
-                          <v-btn icon="mdi-plus" size="x-small" variant="text"></v-btn>
-                        </div>
-                      </div>
-                      
-                      <div class="mb-3">
-                        <div class="font-weight-bold mb-2 d-flex align-items-center">
-                          Resistances
-                          <v-btn icon="mdi-plus" size="x-small" variant="text"></v-btn>
-                        </div>
-                      </div>
+                    <v-expansion-panel-text style="background-color: transparent;">
+                      <!-- Exact Type -->
+                      <v-expansion-panels class="mb-2" style="background-color: transparent;">
+                        <v-expansion-panel style="background-color: transparent; box-shadow: none;">
+                          <v-expansion-panel-title class="pa-2" style="min-height: 36px; background-color: transparent;">
+                            <span class="font-weight-bold" style="font-size: 0.875rem; color: #000000;">Exact Type</span>
+                          </v-expansion-panel-title>
+                          <v-expansion-panel-text style="background-color: transparent;">
+                            <v-row dense>
+                              <v-col cols="6" v-for="i in 4" :key="`exact-${i}`">
+                                <v-select
+                                  :items="pokemonTypes"
+                                  variant="outlined"
+                                  density="compact"
+                                  hide-details
+                                  bg-color="white"
+                                  placeholder="--"
+                                ></v-select>
+                              </v-col>
+                            </v-row>
+                          </v-expansion-panel-text>
+                        </v-expansion-panel>
+                      </v-expansion-panels>
 
-                      <div class="mb-3">
-                        <div class="font-weight-bold mb-2 d-flex align-items-center">
-                          Immunities
-                          <v-btn icon="mdi-plus" size="x-small" variant="text"></v-btn>
-                        </div>
-                      </div>
+                      <!-- Resistances -->
+                      <v-expansion-panels class="mb-2" style="background-color: transparent;">
+                        <v-expansion-panel style="background-color: transparent; box-shadow: none;">
+                          <v-expansion-panel-title class="pa-2" style="min-height: 36px; background-color: transparent;">
+                            <span class="font-weight-bold" style="font-size: 0.875rem; color: #000000;">Resistances</span>
+                          </v-expansion-panel-title>
+                          <v-expansion-panel-text style="background-color: transparent;">
+                            <v-row dense>
+                              <v-col cols="6" v-for="i in 4" :key="`resist-${i}`">
+                                <v-select
+                                  :items="pokemonTypes"
+                                  variant="outlined"
+                                  density="compact"
+                                  hide-details
+                                  bg-color="white"
+                                  placeholder="--"
+                                ></v-select>
+                              </v-col>
+                            </v-row>
+                          </v-expansion-panel-text>
+                        </v-expansion-panel>
+                      </v-expansion-panels>
 
-                      <div>
-                        <div class="font-weight-bold mb-2 d-flex align-items-center">
-                          NOT this type
-                          <v-btn icon="mdi-plus" size="x-small" variant="text"></v-btn>
-                        </div>
-                      </div>
+                      <!-- Immunities -->
+                      <v-expansion-panels class="mb-2" style="background-color: transparent;">
+                        <v-expansion-panel style="background-color: transparent; box-shadow: none;">
+                          <v-expansion-panel-title class="pa-2" style="min-height: 36px; background-color: transparent;">
+                            <span class="font-weight-bold" style="font-size: 0.875rem; color: #000000;">Immunities</span>
+                          </v-expansion-panel-title>
+                          <v-expansion-panel-text style="background-color: transparent;">
+                            <v-row dense>
+                              <v-col cols="6" v-for="i in 2" :key="`immune-${i}`">
+                                <v-select
+                                  :items="pokemonTypes"
+                                  variant="outlined"
+                                  density="compact"
+                                  hide-details
+                                  bg-color="white"
+                                  placeholder="--"
+                                ></v-select>
+                              </v-col>
+                            </v-row>
+                            <v-row dense>
+                              <v-col cols="6" offset="3">
+                                <v-select
+                                  :items="pokemonTypes"
+                                  variant="outlined"
+                                  density="compact"
+                                  hide-details
+                                  bg-color="white"
+                                  placeholder="--"
+                                ></v-select>
+                              </v-col>
+                            </v-row>
+                          </v-expansion-panel-text>
+                        </v-expansion-panel>
+                      </v-expansion-panels>
+
+                      <!-- NOT this type -->
+                      <v-expansion-panels style="background-color: transparent;">
+                        <v-expansion-panel style="background-color: transparent; box-shadow: none;">
+                          <v-expansion-panel-title class="pa-2" style="min-height: 36px; background-color: transparent;">
+                            <span class="font-weight-bold" style="font-size: 0.875rem; color: #000000;">NOT this type</span>
+                          </v-expansion-panel-title>
+                          <v-expansion-panel-text style="background-color: transparent;">
+                            <v-row dense>
+                              <v-col cols="6" v-for="i in 4" :key="`not-${i}`">
+                                <v-select
+                                  :items="pokemonTypes"
+                                  variant="outlined"
+                                  density="compact"
+                                  hide-details
+                                  bg-color="white"
+                                  placeholder="--"
+                                ></v-select>
+                              </v-col>
+                            </v-row>
+                          </v-expansion-panel-text>
+                        </v-expansion-panel>
+                      </v-expansion-panels>
                     </v-expansion-panel-text>
                   </v-expansion-panel>
                 </v-expansion-panels>
+              </div>
+            </div>
               </v-col>
 
               <!-- Main Content Area -->
               <v-col cols="12" md="9">
                 <h1 class="text-h3 text-center mb-4" style="color: #000000;">Search Results!</h1>
 
-                <!-- Tabs for Stats/Price -->
-                <div class="d-flex justify-center mb-4">
-                  <v-btn-toggle v-model="viewMode" mandatory>
-                    <v-btn value="stats" style="background-color: white; color: #000000; text-transform: none !important;">Stats</v-btn>
-                    <v-btn value="price" style="background-color: white; color: #000000; text-transform: none !important;">Price</v-btn>
+                <!-- Stats/Price Toggle -->
+                <div class="d-flex justify-space-between align-items-center mb-4 flex-wrap ga-3">
+                  <v-btn-toggle v-model="viewMode" mandatory style="background-color: #D9D9D9; border-radius: 4px;">
+                    <v-btn 
+                      value="stats" 
+                      style="background-color: #D9D9D9; color: #000000; text-transform: none !important;"
+                      :class="{ 'font-weight-bold': viewMode === 'stats' }"
+                    >
+                      Stats
+                    </v-btn>
+                    <v-btn 
+                      value="price" 
+                      style="background-color: #D9D9D9; color: #000000; text-transform: none !important;"
+                      :class="{ 'font-weight-bold': viewMode === 'price' }"
+                    >
+                      Price
+                    </v-btn>
                   </v-btn-toggle>
                 </div>
 
-                <!-- Quick Search and Pagination -->
+                <!-- Quick Search and Pagination Row -->
                 <div class="d-flex justify-space-between align-items-center mb-4 flex-wrap ga-3">
                   <div class="d-flex align-items-center ga-2">
-                    <span>Quick Search:</span>
+                    <span style="color: #000000; line-height: 1; display: flex; align-items: center;">Quick Search:</span>
                     <v-text-field
+                      v-model="quickSearch"
                       placeholder="Enter Pokémon"
                       variant="outlined"
                       density="compact"
                       hide-details
+                      bg-color="white"
                       style="max-width: 200px;"
                     ></v-text-field>
                   </div>
 
                   <div class="d-flex align-items-center ga-2 flex-wrap">
-                    <v-pagination
-                      v-model="currentPage"
-                      :length="5"
-                      :total-visible="5"
+                    <v-btn
+                      v-for="page in [1, 2, 3, 4]"
+                      :key="page"
+                      :variant="page === currentPage ? 'flat' : 'text'"
                       size="small"
-                    ></v-pagination>
-                    <span>Show</span>
+                      style="background-color: #D9D9D9; color: #000000; min-width: 36px;"
+                      @click="currentPage = page"
+                    >
+                      {{ page }}
+                    </v-btn>
+                    <v-btn
+                      variant="text"
+                      size="small"
+                      style="background-color: #D9D9D9; color: #000000; min-width: 36px;"
+                      @click="nextPage"
+                    >
+                      &gt;
+                    </v-btn>
+
+                    <span style="color: #000000; line-height: 1; display: flex; align-items: center;">Show</span>
                     <v-select
                       v-model="itemsPerPage"
                       :items="[10, 25, 50, 100]"
                       variant="outlined"
                       density="compact"
                       hide-details
+                      bg-color="white"
                       style="max-width: 80px;"
                     ></v-select>
-                    <span>Pokémon per page</span>
+                    <span style="color: #000000; line-height: 1; display: flex; align-items: center;">Pokémon per page</span>
                   </div>
                 </div>
 
                 <!-- Results Table -->
                 <v-table style="background-color: transparent;">
                   <thead>
-                    <tr style="background-color: rgba(255, 255, 255, 0.5);">
-                      <th class="text-center">#</th>
-                      <th class="text-center">Pokemon</th>
-                      <th class="text-center">Type</th>
-                      <th class="text-center">HP</th>
-                      <th class="text-center">Atk</th>
-                      <th class="text-center">Def</th>
-                      <th class="text-center">S.At</th>
-                      <th class="text-center">S.Df</th>
-                      <th class="text-center">Spd</th>
-                      <th class="text-center">BST</th>
+                    <tr style="background-color: #66D276;">
+                      <th
+                        v-for="header in currentHeaders"
+                        :key="header.key"
+                        class="text-center"
+                        style="color: #000000; cursor: pointer;"
+                        @click="header.sortable !== false && sortByColumn(header.key)"
+                      >
+                        {{ header.title }}
+                        <template v-if="header.sortable !== false">
+                          <span class="sort-arrows">
+                            <span class="arrow-up">▲</span>
+                            <span class="arrow-down">▼</span>
+                          </span>
+                        </template>
+                      </th>
                     </tr>
                   </thead>
                   <tbody>
-                    <tr v-for="i in 10" :key="i" style="background-color: rgba(255, 255, 255, 0.3);">
-                      <td class="text-center">XXXX</td>
+                    <tr
+                      v-for="(pokemon, index) in paginatedResults"
+                      :key="index"
+                      :style="{ backgroundColor: index % 2 === 0 ? '#A5D9AB' : '#D7FFDC' }"
+                    >
+                      <td class="text-center" style="color: #000000;">{{ (currentPage - 1) * itemsPerPage + index + 1 }}</td>
                       <td class="text-center">
-                        <div class="d-flex flex-column align-items-center">
-                          <v-img 
+                        <div class="d-flex flex-column align-items-center justify-center">
+                          <v-img
                             src="https://placehold.co/60x60/90EE90/000000?text=PKM"
                             width="60"
                             height="60"
-                            class="mb-1"
+                            class="mb-1 mx-auto"
                           ></v-img>
-                          <span>Pokemon</span>
+                          <span style="color: #000000;">Pokemon</span>
                         </div>
                       </td>
                       <td class="text-center">
-                        <div class="d-flex flex-column align-items-center ga-1">
-                          <v-chip size="small" style="background-color: #90EE90; color: #000000;">Type</v-chip>
-                          <v-chip size="small" style="background-color: #9370DB; color: #FFFFFF;">Type</v-chip>
+                        <div class="d-flex flex-column align-items-center ga-2">
+                          <div style="background-color: #59BD38; color: #FFFFE8; padding: 2px 8px; border-radius: 0; min-width: 60px; text-align: center; border: 1px solid #2C4566;">Type</div>
+                          <div style="background-color: #7B59C1; color: #FFFFE8; padding: 2px 8px; border-radius: 0; min-width: 60px; text-align: center; border: 1px solid #2C4566;">Type</div>
                         </div>
                       </td>
-                      <td class="text-center">XXX</td>
-                      <td class="text-center">XXX</td>
-                      <td class="text-center">XXX</td>
-                      <td class="text-center">XXX</td>
-                      <td class="text-center">XXX</td>
-                      <td class="text-center">XXX</td>
-                      <td class="text-center">XXX</td>
+                      <template v-if="viewMode === 'stats'">
+                        <td class="text-center" style="color: #000000;">XXX</td>
+                        <td class="text-center" style="color: #000000;">XXX</td>
+                        <td class="text-center" style="color: #000000;">XXX</td>
+                        <td class="text-center" style="color: #000000;">XXX</td>
+                        <td class="text-center" style="color: #000000;">XXX</td>
+                        <td class="text-center" style="color: #000000;">XXX</td>
+                        <td class="text-center" style="color: #000000;">XXX</td>
+                      </template>
+                      <template v-else>
+                        <td class="text-center" style="color: #000000;">XX</td>
+                        <td class="text-center" style="color: #000000;">XX</td>
+                        <td class="text-center" style="color: #000000;">XX</td>
+                        <td class="text-center" style="color: #000000;">XX</td>
+                      </template>
                     </tr>
                   </tbody>
                 </v-table>
 
                 <!-- Bottom Pagination -->
-                <div class="d-flex justify-center mt-4">
-                  <v-pagination
-                    v-model="currentPage"
-                    :length="5"
-                    :total-visible="5"
-                  ></v-pagination>
+                <div class="d-flex justify-center align-items-center mt-4 ga-2">
+                  <v-btn
+                    v-for="page in [1, 2, 3, 4]"
+                    :key="`bottom-${page}`"
+                    :variant="page === currentPage ? 'flat' : 'text'"
+                    size="small"
+                    style="background-color: #D9D9D9; color: #000000; min-width: 36px;"
+                    @click="currentPage = page"
+                  >
+                    {{ page }}
+                  </v-btn>
+                  <v-btn
+                    variant="text"
+                    size="small"
+                    style="background-color: #D9D9D9; color: #000000; min-width: 36px;"
+                    @click="nextPage"
+                  >
+                    &gt;
+                  </v-btn>
                 </div>
               </v-col>
             </v-row>
@@ -298,39 +517,224 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { useRouter } from 'vue-router'
+import AppNavbar from '@/components/AppNavbar.vue'
 
 const router = useRouter()
 
+// View mode
 const viewMode = ref('stats')
+const quickSearch = ref('')
 const currentPage = ref(1)
 const itemsPerPage = ref(10)
 
-const priceFilters = ref({
-  sTier: false,
-  aTier: false,
-  bTier: false,
-  cTier: false,
-  dTier: false,
-  eTier: false,
-  oneType: false,
-  twoTypes: false,
-  threeTypes: false,
-  fourTypes: false,
+// Filter states
+const draftPriceMin = ref(1)
+const draftPriceMax = ref(26)
+const draftPriceRange = ref([1, 26])
+const teraPriceMin = ref(1)
+const teraPriceMax = ref(20)
+const teraPriceRange = ref([1, 20])
+const selectedTiers = ref<string[]>([])
+const selectedTeraTypes = ref<number[]>([])
+
+// Expansion panels state
+const openPanels = ref({
+  price: [],
+  stats: [],
+  types: []
 })
+
+const pokemonTypes = [
+  'Normal', 'Fire', 'Water', 'Grass', 'Electric', 'Ice',
+  'Fighting', 'Poison', 'Ground', 'Flying', 'Psychic', 'Bug',
+  'Rock', 'Ghost', 'Dragon', 'Dark', 'Steel', 'Fairy'
+]
+
+// Headers
+const statsHeaders = [
+  { title: '#', key: 'number' },
+  { title: 'Pokemon', key: 'pokemon' },
+  { title: 'Type', key: 'type', sortable: false },
+  { title: 'HP', key: 'hp' },
+  { title: 'Atk', key: 'atk' },
+  { title: 'Def', key: 'def' },
+  { title: 'S.At', key: 'sat' },
+  { title: 'S.Df', key: 'sdf' },
+  { title: 'Spd', key: 'spd' },
+  { title: 'BST', key: 'bst' }
+]
+
+const priceHeaders = [
+  { title: '#', key: 'number' },
+  { title: 'Pokemon', key: 'pokemon' },
+  { title: 'Type', key: 'type', sortable: false },
+  { title: 'Draft Price', key: 'draftPrice' },
+  { title: 'Draft Tier', key: 'draftTier' },
+  { title: 'Tera Price', key: 'teraPrice' },
+  { title: 'Tera Types', key: 'teraTypes' }
+]
+
+const currentHeaders = computed(() => {
+  return viewMode.value === 'stats' ? statsHeaders : priceHeaders
+})
+
+// Mock data (10 rows for now)
+const mockResults = Array(10).fill(null).map((_, i) => ({
+  number: i + 1,
+  pokemon: 'Pokemon',
+  type1: 'Type',
+  type2: 'Type'
+}))
+
+const paginatedResults = computed(() => {
+  const start = (currentPage.value - 1) * itemsPerPage.value
+  const end = start + itemsPerPage.value
+  return mockResults.slice(start, end)
+})
+
+const totalPages = computed(() => {
+  return Math.ceil(mockResults.length / itemsPerPage.value)
+})
+
+const nextPage = () => {
+  if (currentPage.value < totalPages.value) {
+    currentPage.value++
+  }
+}
+
+const sortByColumn = (key: string) => {
+  // TODO: Implement sorting
+  console.log('Sort by:', key)
+}
+
+const getHeaderStyle = (key: string) => {
+  // Fixed width for #, Pokemon, Type columns in both views
+  // Other columns get equal space
+  const fixedColumns = ['number', 'pokemon', 'type']
+  
+  if (fixedColumns.includes(key)) {
+    return 'color: #000000; cursor: pointer; width: auto;'
+  }
+  return 'color: #000000; cursor: pointer;'
+}
+
+const getCellStyle = (columnName: string, index: number) => {
+  const baseColor = index % 2 === 0 ? '#A5D9AB' : '#D7FFDC'
+  return `color: #000000; background-color: ${baseColor};`
+}
 
 const goToAdvancedSearch = () => {
   router.push({ path: '/search', query: { mode: 'advanced' } })
 }
+
+// Watch sliders and sync with inputs
+watch(draftPriceMin, (newVal) => {
+  if (newVal >= 1 && newVal <= 26) {
+    if (newVal <= draftPriceMax.value) {
+      draftPriceRange.value = [newVal, draftPriceRange.value[1]!]
+    }
+  }
+})
+
+watch(draftPriceMax, (newVal) => {
+  if (newVal >= 1 && newVal <= 26) {
+    if (newVal >= draftPriceMin.value) {
+      draftPriceRange.value = [draftPriceRange.value[0]!, newVal]
+    }
+  }
+})
+
+watch(draftPriceRange, (newVal) => {
+  draftPriceMin.value = newVal[0]!
+  draftPriceMax.value = newVal[1]!
+})
+
+watch(teraPriceMin, (newVal) => {
+  if (newVal >= 1 && newVal <= 20) {
+    if (newVal <= teraPriceMax.value) {
+      teraPriceRange.value = [newVal, teraPriceRange.value[1]!]
+    }
+  }
+})
+
+watch(teraPriceMax, (newVal) => {
+  if (newVal >= 1 && newVal <= 20) {
+    if (newVal >= teraPriceMin.value) {
+      teraPriceRange.value = [teraPriceRange.value[0]!, newVal]
+    }
+  }
+})
+
+watch(teraPriceRange, (newVal) => {
+  teraPriceMin.value = newVal[0]!
+  teraPriceMax.value = newVal[1]!
+})
 </script>
 
 <style scoped>
-.nav-button {
-  text-transform: none !important;
-  font-family: 'Inter', sans-serif;
-  font-weight: 500;
-  letter-spacing: 0;
+/* Checkbox styling - same as AdvancedSearch.vue */
+:deep(.v-checkbox .v-selection-control__input) {
+  width: 18px;
+  height: 18px;
+  background-color: rgb(255, 255, 255);
+  border-radius: 1px;
+}
+
+:deep(.v-selection-control__input .v-icon) {
+  color: white !important;
+}
+
+:deep(.v-selection-control--dirty .v-selection-control__input .v-icon) {
+  color: #000000 !important;
+  font-size: 26px !important;
+}
+
+/* Number input arrow styling */
+:deep(input[type="number"]::-webkit-inner-spin-button),
+:deep(input[type="number"]::-webkit-outer-spin-button) {
+  opacity: 1;
+  position: relative;
+  margin-left: auto;
+  cursor: pointer;
+}
+
+:deep(input[type="number"]) {
+  text-align: left;
+  padding-right: 4px !important;
+}
+
+/* Sort arrows styling - spread out */
+.sort-arrows {
+  display: inline-flex;
+  flex-direction: column;
+  margin-left: 4px;
+  line-height: 1;
+  vertical-align: middle;
+  gap: 1px;
+}
+
+.arrow-up {
+  font-size: 10px;
   color: #000000;
+}
+
+.arrow-down {
+  font-size: 10px;
+  color: #000000;
+}
+
+/* Remove expansion panel shadows */
+:deep(.v-expansion-panel) {
+  box-shadow: none !important;
+}
+
+:deep(.v-expansion-panel::before) {
+  box-shadow: none !important;
+}
+
+:deep(.v-expansion-panel::after) {
+  box-shadow: none !important;
 }
 </style>

@@ -2,8 +2,19 @@
   <v-card 
     elevation="0" 
     class="pa-12"
-    style="background-color: #FFFCAD; border-radius: 12px;"
+    style="background-color: #FFFCAD; border-radius: 12px; position: relative;"
   >
+    <!-- Loading Overlay -->
+    <v-overlay :model-value="loading" class="align-center justify-center" contained>
+      <v-progress-circular indeterminate size="64" color="#133AFF"></v-progress-circular>
+      <div class="text-h6 mt-4" style="color: #000000;">Loading types...</div>
+    </v-overlay>
+
+    <!-- Error Alert -->
+    <v-alert v-if="error" type="error" class="mb-4" closable @click:close="error = null">
+      {{ error }}
+    </v-alert>
+
     <h1 class="text-h3 text-center mb-8" style="color: #000000;">Simple Search!</h1>
 
     <!-- Pokemon Name Search Accordion -->
@@ -195,25 +206,61 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 
 const router = useRouter()
+
+// Loading and error states
+const loading = ref(false)
+const error = ref<string | null>(null)
+
 const pokemonSearch = ref('')
 const selectedTier = ref('')
 const selectedType1 = ref('')
 const selectedType2 = ref('')
 const openPanel = ref<string | undefined>('name')
 const tiers = ['S', 'A', 'B', 'C', 'D', 'F']
-const types = [
-  'Normal', 'Fire', 'Water', 'Grass', 'Electric', 'Ice',
-  'Fighting', 'Poison', 'Ground', 'Flying', 'Psychic', 'Bug',
-  'Rock', 'Ghost', 'Dragon', 'Dark', 'Steel', 'Fairy'
-]
+const types = ref<string[]>([])
 
 defineEmits<{
   'switch-to-advanced': []
 }>()
+
+// Load types from backend on mount
+onMounted(async () => {
+  try {
+    loading.value = true
+    error.value = null
+    
+    // Fetch types from backend
+    const typeQuery = await fetch("http://localhost:3000/types")
+    
+    if (!typeQuery.ok) {
+      throw new Error("Failed to fetch types from server")
+    }
+    
+    const typeData = await typeQuery.json()
+    
+    // Extract type names into array
+    // Backend returns: [{ Type: "Fire" }, { Type: "Water" }, ...]
+    types.value = typeData.map((item: any) => item.Type)
+    
+    console.log(`✅ Loaded ${types.value.length} types`)
+  } catch (err) {
+    console.error('❌ Failed to load types:', err)
+    error.value = 'Failed to load Pokemon types. Using default list.'
+    
+    // Fallback to hardcoded types if fetch fails
+    types.value = [
+      'Normal', 'Fire', 'Water', 'Grass', 'Electric', 'Ice',
+      'Fighting', 'Poison', 'Ground', 'Flying', 'Psychic', 'Bug',
+      'Rock', 'Ghost', 'Dragon', 'Dark', 'Steel', 'Fairy'
+    ]
+  } finally {
+    loading.value = false
+  }
+})
 
 const searchByName = () => {
   if (pokemonSearch.value.trim()) {
@@ -231,8 +278,8 @@ const searchByTier = () => {
 
 const searchByType = () => {
   const params = new URLSearchParams()
-  if (selectedType1.value) params.append('type1', selectedType1.value)
-  if (selectedType2.value) params.append('type2', selectedType2.value)
+  if (selectedType1.value) params.append('resist', selectedType1.value)
+  if (selectedType2.value) params.append('resist', selectedType2.value)
   
   if (params.toString()) {
     router.push(`/search/results?${params.toString()}`)
