@@ -723,6 +723,7 @@
 import { ref, computed, watch } from 'vue'
 import { useRouter } from 'vue-router'
 
+console.log("script starting");
 const router = useRouter()
 
 defineEmits<{
@@ -755,17 +756,36 @@ const sortOptions = [
   'Base Stat Total'
 ]
 
+import {onMounted} from "vue";
+
 // TODO: Fetch from backend
 const abilityNames = ref<string[]>([
-  'Adaptability', 'Aerilate', 'Aftermath', 'Air Lock', 'Analytic',
   // Add more abilities which will come from backend ;-;
 ])
 
 // TODO: Fetch from backend
 const moveNames = ref<string[]>([
-  'Thunderbolt', 'Ice Beam', 'Flamethrower', 'Surf', 'Earthquake',
   // Add more abilities which will come from backend ;-;
 ])
+
+// This is how you do the data grabbing :D
+onMounted (async () => {
+  try {
+    const [abilityQuery, moveQuery] = await Promise.all([
+      fetch("http://localhost:3000/abilities"),
+      fetch("http://localhost:3000/moves")
+    ])
+
+    if (!abilityQuery.ok || !moveQuery.ok) throw new Error("Network error");
+    const abilityData = await abilityQuery.json();
+    const moveData = await moveQuery.json();
+    abilityNames.value = abilityData.map(item => item.AbilityName);     // You might be wondering what these random names are
+    moveNames.value = moveData.map(item => item.Move);                  // Refer to the backend README docs about query return structure
+  } catch (err) {
+    console.log(err);
+  }
+})
+
 
 const priceFilterType = ref<'range' | 'tier'>('range')
 const teraFilterType = ref<'range' | 'types'>('range')

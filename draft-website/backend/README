@@ -106,3 +106,22 @@ http://localhost:3000/pokemon?nottype=Grass&nottype=Fire               // Look f
 You can mix and match these filters, along with the previous ones too:
 http://localhost:3000/pokemon?immune=Ground&type=Dragon&any&hp[gt]=70     // Look for pokemon with immunity to Ground type moves,
                                                                           // are a Dragon type, and has hp > 70
+
+When you fetch data from any of these sources, it will return a list of mappings.
+Inspect the mappings to make sure you are extracting the right data name by manually
+putting the link in your browser.
+
+For example, http://localhost:3000/abilities will return
+
+[
+    {AbilityName: "Adaptability"},
+    {AbilityName: "Aerilate"},
+    etc.
+]
+
+So on a fetch in the frontend, if you wanted this data in a list, you will have to do something like:
+
+const abilityNames = ref<string[]>([]);
+const res = await fetch(http://localhost:3000/abilities);
+const data = await res.json(); 
+abilityNames.value = data.map(item => item.AbilityName);
