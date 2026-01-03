@@ -18,6 +18,15 @@ const OPS = {
 
 
 
+function nameFilter(name) {
+    // Add name search to the current SQL query
+    // Since most pokemon names are unique, this shouldn't return more than a few results
+    const join_string = "";
+
+    const search_string = `p.Pokemon COLLATE NOCASE = "${name}"`;
+    return {join_string, search_string};
+}
+
 function statFilter([stat, arg]) {
     // Add stat search to the current SQL query
     // stat should be a valid stat category such as 
@@ -183,24 +192,27 @@ function generateFilters(routeQuery) {
             filters.push(statFilter);
             args.push([key, value]);
         } else if (key.toLowerCase() === "movetype") {
-            if ( used_move_name_filter ) { throw new Error ("Alreadu used move name filter, cannot use movetype filter")}
+            if ( used_move_name_filter ) { throw new Error ("Already used move name filter, cannot use movetype filter")}
             used_move_specific_filter = true;
             filters.push(moveTypeFilter);
             args.push(value);
         } else if (key.toLowerCase() === "class") {
-            if ( used_move_name_filter ) { throw new Error ("Alreadu used move name filter, cannot use class filter")}
+            if ( used_move_name_filter ) { throw new Error ("Already used move name filter, cannot use class filter")}
             used_move_specific_filter = true;
             filters.push(classFilter);
             args.push(value);
         } else if (key.toLowerCase() === "power") {
-            if ( used_move_name_filter ) { throw new Error ("Alreadu used move name filter, cannot use power filter")}
+            if ( used_move_name_filter ) { throw new Error ("Already used move name filter, cannot use power filter")}
             used_move_specific_filter = true;
             filters.push(powerFilter);
             args.push(value);
         } else if (key.toLowerCase() === "accuracy") {
-            if ( used_move_name_filter ) { throw new Error ("Alreadu used move name filter, cannot use accuracy filter")}
+            if ( used_move_name_filter ) { throw new Error ("Already used move name filter, cannot use accuracy filter")}
             used_move_specific_filter = true;
             filters.push(accuracyFilter);
+            args.push(value);
+        } else if (key.toLowerCase() === "name")  {
+            filters.push(nameFilter);
             args.push(value);
         }
     }
@@ -211,7 +223,7 @@ function generateFilters(routeQuery) {
 function buildQuery(filters, args) {
     // Using what is returned in req.query from the request route,
     // make an SQL query from it with the appropriate filters
-    let sql = `SELECT DISTINCT p.Pokemon, p.Type1, p.Type2 FROM Pokemon p\n`;
+    let sql = `SELECT DISTINCT p.Pokemon, p.Type1, p.Type2, HP, Atk, Def, "S.At", "S.Df", Spd, BST FROM Pokemon p\n`;
     var joins = [];
     const searches = [];
 
@@ -526,6 +538,16 @@ module.exports = function(app) {
             res.status(500).json({ error: 'Database query failed' });
         }
     });
+
+    router.get("/names", async (req, res) => {
+        try {
+            const result = await db.execute(`SELECT DISTINCT Pokemon FROM Pokemon ORDER BY Pokemon`);
+            res.json(result.rows);
+        } catch (err) {
+            console.error(err);
+            res.status(500).json({ error: 'Database query failed' });
+        }
+    })
 
 
     app.use('/', router);

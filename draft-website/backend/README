@@ -27,6 +27,7 @@ are predefined in routes/home.js.
 
 The following routes get a list of all moves/abilities in the game, respectively:
 
+http://localhost:3000/names
 http://localhost:3000/moves
 http://localhost:3000/abilities
 
@@ -51,6 +52,7 @@ http://localhost:3000/pokemon?move=name                         // Query pokemon
 http://localhost:3000/pokemon?move=Vine Whip                    // Find all pokemon that can learn Vine Whip
 http://localhost:3000/pokemon?move=Vine Whip&move=Tackle        // Find all pokemon that can learn both Vine Whip and Tackle
 
+http://localhost:3000/pokemon?name=name                         // Query pokemon by their name
 
 The filters below apply to one specific move if they are composed.
 For example, if the power[gt]=120 and movetype=Fire filters are applied,
