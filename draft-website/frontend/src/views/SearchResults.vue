@@ -517,11 +517,16 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue'
-import { useRouter } from 'vue-router'
+import { ref, computed, watch, onMounted } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 import AppNavbar from '@/components/AppNavbar.vue'
 
 const router = useRouter()
+const route = useRoute()
+
+// Loading and error states
+const loading = ref(false)
+const error = ref<string | null>(null)
 
 // View mode
 const viewMode = ref('stats')
@@ -580,22 +585,68 @@ const currentHeaders = computed(() => {
   return viewMode.value === 'stats' ? statsHeaders : priceHeaders
 })
 
-// Mock data (10 rows for now)
-const mockResults = Array(10).fill(null).map((_, i) => ({
-  number: i + 1,
-  pokemon: 'Pokemon',
-  type1: 'Type',
-  type2: 'Type'
-}))
+// Real results from backend
+const allResults = ref<any[]>([])
 
 const paginatedResults = computed(() => {
   const start = (currentPage.value - 1) * itemsPerPage.value
   const end = start + itemsPerPage.value
-  return mockResults.slice(start, end)
+  return allResults.value.slice(start, end)
 })
 
 const totalPages = computed(() => {
-  return Math.ceil(mockResults.length / itemsPerPage.value)
+  return Math.ceil(allResults.value.length / itemsPerPage.value)
+})
+
+// Fetch results from backend
+const fetchResults = async () => {
+  try {
+    loading.value = true
+    error.value = null
+    
+    // Get query parameters from URL
+    const queryString = route.fullPath.split('?')[1] || ''
+    
+    if (!queryString) {
+      // No search parameters - show message
+      error.value = 'No search parameters provided. Please use the search page to find Pokemon.'
+      allResults.value = []
+      return
+    }
+    
+    console.log('🔍 Fetching Pokemon with query:', queryString)
+    
+    // Fetch from backend
+    const response = await fetch(`http://localhost:3000/pokemon?${queryString}`)
+    
+    if (!response.ok) {
+      throw new Error(`Server returned ${response.status}: ${response.statusText}`)
+    }
+    
+    const data = await response.json()
+    
+    console.log(`✅ Found ${data.length} Pokemon`)
+    
+    allResults.value = data
+    currentPage.value = 1 // Reset to first page
+    
+  } catch (err) {
+    console.error('❌ Search failed:', err)
+    error.value = `Failed to load search results: ${err instanceof Error ? err.message : 'Unknown error'}`
+    allResults.value = []
+  } finally {
+    loading.value = false
+  }
+}
+
+// Watch for route changes (new searches)
+watch(() => route.query, () => {
+  fetchResults()
+})
+
+// Fetch on mount
+onMounted(() => {
+  fetchResults()
 })
 
 const nextPage = () => {
@@ -611,7 +662,6 @@ const sortByColumn = (key: string) => {
 
 const getHeaderStyle = (key: string) => {
   // Fixed width for #, Pokemon, Type columns in both views
-  // Other columns get equal space
   const fixedColumns = ['number', 'pokemon', 'type']
   
   if (fixedColumns.includes(key)) {
