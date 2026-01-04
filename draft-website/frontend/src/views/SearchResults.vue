@@ -472,8 +472,29 @@
                       </td>
                       <td class="text-center">
                         <div class="d-flex flex-column align-items-center ga-2">
-                          <div style="background-color: #59BD38; color: #FFFFE8; padding: 2px 8px; border-radius: 0; min-width: 60px; text-align: center; border: 1px solid #2C4566;">Type</div>
-                          <div style="background-color: #7B59C1; color: #FFFFE8; padding: 2px 8px; border-radius: 0; min-width: 60px; text-align: center; border: 1px solid #2C4566;">Type</div>
+                          <div 
+                            :style="{
+                              backgroundColor: typeColors[pokemon.Type1],
+                              color: '#FFFFE8',
+                              padding: '2px 8px',
+                              borderRadius: '0',
+                              minWidth: '60px',
+                              textAlign: 'center',
+                              border: '1px solid #2C4566'
+                            }"
+                          >{{pokemon["Type1"]}}</div>
+                          <div
+                            v-if="pokemon.Type2 !== 'NULL'"
+                            :style="{
+                              backgroundColor: typeColors[pokemon.Type2],
+                              color: '#FFFFE8',
+                              padding: '2px 8px',
+                              borderRadius: '0',
+                              minWidth: '60px',
+                              textAlign: 'center',
+                              border: '1px solid #2C4566'
+                            }"
+                          >{{pokemon["Type2"]}}</div>                        
                         </div>
                       </td>
                       <template v-if="viewMode === 'stats'">
@@ -565,6 +586,29 @@ const pokemonTypes = [
   'Fighting', 'Poison', 'Ground', 'Flying', 'Psychic', 'Bug',
   'Rock', 'Ghost', 'Dragon', 'Dark', 'Steel', 'Fairy'
 ]
+
+const typeColors = {
+  'Normal': "#DDD4BF", 
+  'Fire': "#CE373C",
+  'Water': "#47A2DB",
+  'Grass': "#59BD38",
+  'Electric': "#D7CC2B",
+  'Ice': "#A9F3EE",
+  'Fighting': "#BA7060",
+  'Poison': "#7B59C1",
+  'Ground': "#C59D5B",
+  'Flying': "#7EACD9",
+  'Psychic': "#BB51B9",
+  'Bug': "#B0B751",
+  'Rock': "#845B36",
+  'Ghost': "#5B557D",
+  'Dragon': "#5554DD",
+  'Dark': "#484746",
+  'Steel': "#A8B1B3",
+  'Fairy': "#E0ABE0",
+}
+
+
 
 // Headers
 const statsHeaders = [
