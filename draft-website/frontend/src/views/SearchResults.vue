@@ -393,7 +393,7 @@
                   </v-btn-toggle>
                 </div>
 
-                <!-- Quick Search and Pagination Row -->
+<!-- Quick Search and Pagination Row -->
                 <div class="d-flex justify-space-between align-items-center mb-4 flex-wrap ga-3">
                   <div class="d-flex align-items-center ga-2">
                     <span style="color: #000000; line-height: 1; display: flex; align-items: center;">Quick Search:</span>
@@ -439,6 +439,18 @@
                     >
                       &gt;
                     </v-btn>
+
+                    <span style="color: #000000; line-height: 1; display: flex; align-items: center;">Show</span>
+                    <v-select
+                      v-model="itemsPerPage"
+                      :items="[10, 25, 50, 100]"
+                      variant="outlined"
+                      density="compact"
+                      hide-details
+                      bg-color="white"
+                      style="max-width: 80px;"
+                    ></v-select>
+                    <span style="color: #000000; line-height: 1; display: flex; align-items: center;">Pokémon per page</span>
                   </div>
                 </div>
 
@@ -496,11 +508,7 @@
                         <div class="d-flex flex-column align-items-center ga-2">
                           <div 
                             :style="{
-<<<<<<< HEAD
-                              backgroundColor: typeColors[pokemon.Type1],
-=======
                               backgroundColor: typeColors[pokemon.Type1 as keyof typeof typeColors],
->>>>>>> 43de306 (Refined SearchResults UI, including input validation, prev/next pagination, curved table corners)
                               color: '#FFFFE8',
                               padding: '2px 8px',
                               borderRadius: '0',
@@ -512,11 +520,7 @@
                           <div
                             v-if="pokemon.Type2 !== 'NULL'"
                             :style="{
-<<<<<<< HEAD
-                              backgroundColor: typeColors[pokemon.Type2],
-=======
                               backgroundColor: typeColors[pokemon.Type2 as keyof typeof typeColors],
->>>>>>> 43de306 (Refined SearchResults UI, including input validation, prev/next pagination, curved table corners)
                               color: '#FFFFE8',
                               padding: '2px 8px',
                               borderRadius: '0',
@@ -524,11 +528,7 @@
                               textAlign: 'center',
                               border: '1px solid #2C4566'
                             }"
-<<<<<<< HEAD
                           >{{pokemon["Type2"]}}</div>                        
-=======
-                          >{{pokemon["Type2"]}}</div>   
->>>>>>> 43de306 (Refined SearchResults UI, including input validation, prev/next pagination, curved table corners)
                         </div>
                       </td>
                       <template v-if="viewMode === 'stats'">
@@ -679,11 +679,7 @@ const typeColors = {
   'Fairy': "#E0ABE0",
 }
 
-<<<<<<< HEAD
 
-
-=======
->>>>>>> 43de306 (Refined SearchResults UI, including input validation, prev/next pagination, curved table corners)
 // Headers
 const statsHeaders = [
   { title: '#', key: 'number' },
