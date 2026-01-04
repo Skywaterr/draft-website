@@ -453,11 +453,20 @@
                       <td class="text-center">
                         <div class="d-flex flex-column align-items-center justify-center">
                           <v-img
-                            src="https://placehold.co/60x60/90EE90/000000?text=PKM"
+                            :src="`/${pokemon.Name}.png`"
                             width="60"
                             height="60"
                             class="mb-1 mx-auto"
-                          ></v-img>
+                          >  
+                            <template #error>
+                              <v-img
+                                src="/unown.png"
+                                width="60"
+                                height="60"
+                                alt="Unknown Pokémon"
+                              />
+                            </template>
+                          </v-img>
                           <span style="color: #000000;">{{pokemon["Pokemon"]}}</span>
                         </div>
                       </td>
