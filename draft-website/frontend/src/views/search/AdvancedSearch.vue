@@ -735,7 +735,6 @@
 import { ref, computed, watch } from 'vue'
 import { useRouter } from 'vue-router'
 
-console.log("script starting");
 const router = useRouter()
 
 defineEmits<{
@@ -1100,7 +1099,12 @@ const performSearch = () => {
   }
 
   // TODO: Add other filters (moves, types, price, etc.) when backend is booted
-  
+  filters.value.moves.forEach(move => {
+    if (move.enabled && move.name) {
+      params.append('move', move.name);
+    }
+  })
+
   // Navigate to results with query params
   router.push(`/search/results?${params.toString()}`)
 }
