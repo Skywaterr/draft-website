@@ -14,7 +14,7 @@
                 <!-- Back Buttons - Stacked at top left -->
                 <div class="d-flex flex-column ga-2 mb-4">
                   <v-btn
-                    style="background-color: #FFFCAD; color: #000000; text-transform: none !important;"
+                    style="background-color: #FFFCAD; color: #000000; text-transform: none !important; justify-content: flex-start; padding-left: 12px; width: fit-content;"
                     variant="flat"
                     size="small"
                     @click="$router.push('/search')"
@@ -22,7 +22,7 @@
                     ← Back to Simple Search!
                   </v-btn>
                   <v-btn
-                    style="background-color: #ADB0FF; color: #000000; text-transform: none !important;"
+                    style="background-color: #ADB0FF; color: #000000; text-transform: none !important; justify-content: flex-start; padding-left: 12px; width: fit-content;"
                     variant="flat"
                     size="small"
                     @click="goToAdvancedSearch"
@@ -56,6 +56,8 @@
                           :min="1"
                           :max="26"
                           style="max-width: 70px;"
+                          @input="validateDraftPriceMin"
+                          @keypress="onlyNumbers"
                         ></v-text-field>
                         <span style="color: #000000; line-height: 1; display: flex; align-items: center;">to</span>
                         <v-text-field
@@ -69,6 +71,8 @@
                           :min="1"
                           :max="26"
                           style="max-width: 70px;"
+                          @input="validateDraftPriceMax"
+                          @keypress="onlyNumbers"
                         ></v-text-field>
                       </div>
 
@@ -85,7 +89,8 @@
                         color="#133AFF"
                         track-color="rgba(0,0,0,0.2)"
                         thumb-color="white"
-                        class="mt-2 mb-4"
+                        class="mt-2"
+                        style="margin-bottom: -25px;"
                       >
                         <template v-slot:prepend>
                           <div class="text-caption" style="color: #000000;">1</div>
@@ -137,6 +142,8 @@
                           :min="1"
                           :max="20"
                           style="max-width: 70px;"
+                          @input="validateTeraPriceMin"
+                          @keypress="onlyNumbers"
                         ></v-text-field>
                         <span style="color: #000000; line-height: 1; display: flex; align-items: center;">to</span>
                         <v-text-field
@@ -150,6 +157,8 @@
                           :min="1"
                           :max="20"
                           style="max-width: 70px;"
+                          @input="validateTeraPriceMax"
+                          @keypress="onlyNumbers"
                         ></v-text-field>
                       </div>
 
@@ -166,7 +175,8 @@
                         color="#133AFF"
                         track-color="rgba(0,0,0,0.2)"
                         thumb-color="white"
-                        class="mt-2 mb-4"
+                        class="mt-2"
+                        style="margin-bottom: -25px;"
                       >
                         <template v-slot:prepend>
                           <div class="text-caption" style="color: #000000;">1</div>
@@ -177,7 +187,7 @@
                       </v-range-slider>
 
                       <!-- Tera Types Checkboxes -->
-                      <div class="d-flex ga-0 flex-nowrap" style="margin-left: -10px;">
+                      <div class="d-flex ga-1 flex-nowrap" style="margin-left: -10px; width: calc(100% + 30px);">
                         <v-checkbox
                           v-for="num in [1, 2, 3, 4]"
                           :key="num"
@@ -194,7 +204,7 @@
                   </v-expansion-panel>
                 </v-expansion-panels>
 
-                <!-- Base Stats Filter -->
+<!-- Base Stats Filter -->
                 <v-expansion-panels class="mb-3" v-model="openPanels.stats" style="background-color: transparent;">
                   <v-expansion-panel style="background-color: transparent; box-shadow: none;">
                     <v-expansion-panel-title style="background-color: transparent; min-height: 40px;">
@@ -203,28 +213,38 @@
                     <v-expansion-panel-text style="background-color: transparent;">
                       <div class="d-flex flex-column ga-2">
                         <div
-                          v-for="stat in ['HP', 'Attack', 'Defense', 'Sp. Attack', 'Sp. Defense', 'Speed', 'BST']"
-                          :key="stat"
+                          v-for="stat in baseStats"
+                          :key="stat.id"
                           class="d-flex align-items-center ga-2"
                         >
-                          <v-checkbox hide-details density="compact" color="#000000" style="flex-shrink: 0;"></v-checkbox>
-                          <span style="min-width: 80px; font-size: 0.875rem; color: #000000; line-height: 1; display: flex; align-items: center;">{{ stat }}:</span>
+                          <v-checkbox 
+                            v-model="stat.enabled" 
+                            hide-details 
+                            density="compact" 
+                            color="#000000" 
+                            style="flex-shrink: 0;"
+                          ></v-checkbox>
+                          <span style="min-width: 60px; font-size: 0.875rem; color: #000000; line-height: 1; display: flex; align-items: center;">{{ stat.label }}:</span>
                           <v-select
-                            :items="['At least (≥)', 'At Most (≤)', 'Exactly (=)']"
+                            v-model="stat.operator"
+                            :items="operators"
                             variant="outlined"
                             density="compact"
                             hide-details
                             bg-color="white"
-                            style="max-width: 110px; font-size: 0.75rem;"
+                            style="max-width: 200px; font-size: 0.75rem;"
                           ></v-select>
                           <v-text-field
+                            v-model="stat.value"
                             placeholder="###"
                             variant="outlined"
                             density="compact"
                             hide-details
                             bg-color="white"
                             type="number"
-                            style="max-width: 55px;"
+                            style="max-width: 70px;"
+                            @input="validateStatValue(stat)"
+                            @keypress="onlyNumbers"
                           ></v-text-field>
                         </div>
                       </div>
@@ -355,7 +375,7 @@
 
                 <!-- Stats/Price Toggle -->
                 <div class="d-flex justify-space-between align-items-center mb-4 flex-wrap ga-3">
-                  <v-btn-toggle v-model="viewMode" mandatory style="background-color: #D9D9D9; border-radius: 4px;">
+                  <v-btn-toggle v-model="viewMode" mandatory style="background-color: #D9D9D9; border-radius: 0;">
                     <v-btn 
                       value="stats" 
                       style="background-color: #D9D9D9; color: #000000; text-transform: none !important;"
@@ -384,11 +404,23 @@
                       density="compact"
                       hide-details
                       bg-color="white"
-                      style="max-width: 200px;"
+                      width="310px"
+                      rounded
                     ></v-text-field>
                   </div>
 
                   <div class="d-flex align-items-center ga-2 flex-wrap">
+                    <!-- Previous button (only show if not on page 1) -->
+                    <v-btn
+                      v-if="currentPage > 1"
+                      variant="text"
+                      size="small"
+                      style="background-color: #D9D9D9; color: #000000; min-width: 36px;"
+                      @click="prevPage"
+                    >
+                      &lt;
+                    </v-btn>
+
                     <v-btn
                       v-for="page in [1, 2, 3, 4]"
                       :key="page"
@@ -407,20 +439,10 @@
                     >
                       &gt;
                     </v-btn>
-
-                    <span style="color: #000000; line-height: 1; display: flex; align-items: center;">Show</span>
-                    <v-select
-                      v-model="itemsPerPage"
-                      :items="[10, 25, 50, 100]"
-                      variant="outlined"
-                      density="compact"
-                      hide-details
-                      bg-color="white"
-                      style="max-width: 80px;"
-                    ></v-select>
-                    <span style="color: #000000; line-height: 1; display: flex; align-items: center;">Pokémon per page</span>
                   </div>
                 </div>
+
+                <!-- Results Table -->
 
                 <!-- Results Table -->
                 <v-table style="background-color: transparent;">
@@ -474,7 +496,11 @@
                         <div class="d-flex flex-column align-items-center ga-2">
                           <div 
                             :style="{
+<<<<<<< HEAD
                               backgroundColor: typeColors[pokemon.Type1],
+=======
+                              backgroundColor: typeColors[pokemon.Type1 as keyof typeof typeColors],
+>>>>>>> 43de306 (Refined SearchResults UI, including input validation, prev/next pagination, curved table corners)
                               color: '#FFFFE8',
                               padding: '2px 8px',
                               borderRadius: '0',
@@ -486,7 +512,11 @@
                           <div
                             v-if="pokemon.Type2 !== 'NULL'"
                             :style="{
+<<<<<<< HEAD
                               backgroundColor: typeColors[pokemon.Type2],
+=======
+                              backgroundColor: typeColors[pokemon.Type2 as keyof typeof typeColors],
+>>>>>>> 43de306 (Refined SearchResults UI, including input validation, prev/next pagination, curved table corners)
                               color: '#FFFFE8',
                               padding: '2px 8px',
                               borderRadius: '0',
@@ -494,7 +524,11 @@
                               textAlign: 'center',
                               border: '1px solid #2C4566'
                             }"
+<<<<<<< HEAD
                           >{{pokemon["Type2"]}}</div>                        
+=======
+                          >{{pokemon["Type2"]}}</div>   
+>>>>>>> 43de306 (Refined SearchResults UI, including input validation, prev/next pagination, curved table corners)
                         </div>
                       </td>
                       <template v-if="viewMode === 'stats'">
@@ -518,6 +552,17 @@
 
                 <!-- Bottom Pagination -->
                 <div class="d-flex justify-center align-items-center mt-4 ga-2">
+                  <!-- Previous button (only show if not on page 1) -->
+                  <v-btn
+                    v-if="currentPage > 1"
+                    variant="text"
+                    size="small"
+                    style="background-color: #D9D9D9; color: #000000; min-width: 36px;"
+                    @click="prevPage"
+                  >
+                    &lt;
+                  </v-btn>
+
                   <v-btn
                     v-for="page in [1, 2, 3, 4]"
                     :key="`bottom-${page}`"
@@ -581,6 +626,32 @@ const openPanels = ref({
   types: []
 })
 
+const operators = [
+  'At Least (≥)',
+  'More Than (>)',
+  'Exactly (=)',
+  'Less Than (<)',
+  'At Most (≤)'
+]
+
+const baseStats = ref([
+  { id: 'hp', label: 'HP', enabled: false, operator: 'At Least (≥)', value: '' },
+  { id: 'attack', label: 'Attack', enabled: false, operator: 'At Least (≥)', value: '' },
+  { id: 'defense', label: 'Defense', enabled: false, operator: 'At Least (≥)', value: '' },
+  { id: 'spattack', label: 'Sp. Atk', enabled: false, operator: 'At Least (≥)', value: '' },
+  { id: 'spdefense', label: 'Sp. Def', enabled: false, operator: 'At Least (≥)', value: '' },
+  { id: 'speed', label: 'Speed', enabled: false, operator: 'At Least (≥)', value: '' },
+  { id: 'bst', label: 'BST', enabled: false, operator: 'At Least (≥)', value: '' }
+])
+
+const autoEnableStatCheckbox = (stat: any) => {
+  if (stat.value) {
+    stat.enabled = true
+  } else {
+    stat.enabled = false
+  }
+}
+
 const pokemonTypes = [
   'Normal', 'Fire', 'Water', 'Grass', 'Electric', 'Ice',
   'Fighting', 'Poison', 'Ground', 'Flying', 'Psychic', 'Bug',
@@ -608,8 +679,11 @@ const typeColors = {
   'Fairy': "#E0ABE0",
 }
 
+<<<<<<< HEAD
 
 
+=======
+>>>>>>> 43de306 (Refined SearchResults UI, including input validation, prev/next pagination, curved table corners)
 // Headers
 const statsHeaders = [
   { title: '#', key: 'number' },
@@ -650,6 +724,12 @@ const paginatedResults = computed(() => {
 const totalPages = computed(() => {
   return Math.ceil(allResults.value.length / itemsPerPage.value)
 })
+
+const prevPage = () => {
+  if (currentPage.value > 1) {
+    currentPage.value--
+  }
+}
 
 // Fetch results from backend
 const fetchResults = async () => {
@@ -774,6 +854,56 @@ watch(teraPriceRange, (newVal) => {
   teraPriceMin.value = newVal[0]!
   teraPriceMax.value = newVal[1]!
 })
+
+const onlyNumbers = (event: KeyboardEvent) => {
+  const char = event.key
+  // Allow only digits 0-9
+  if (!/^\d$/.test(char)) {
+    event.preventDefault()
+  }
+}
+
+const validateDraftPriceMin = () => {
+  if (draftPriceMin.value < 1) draftPriceMin.value = 1
+  if (draftPriceMin.value > 26) draftPriceMin.value = 26
+  draftPriceMin.value = Math.floor(draftPriceMin.value)
+}
+
+const validateDraftPriceMax = () => {
+  if (draftPriceMax.value < 1) draftPriceMax.value = 1
+  if (draftPriceMax.value > 26) draftPriceMax.value = 26
+  draftPriceMax.value = Math.floor(draftPriceMax.value)
+}
+
+const validateTeraPriceMin = () => {
+  if (teraPriceMin.value < 1) teraPriceMin.value = 1
+  if (teraPriceMin.value > 20) teraPriceMin.value = 20
+  teraPriceMin.value = Math.floor(teraPriceMin.value)
+}
+
+const validateTeraPriceMax = () => {
+  if (teraPriceMax.value < 1) teraPriceMax.value = 1
+  if (teraPriceMax.value > 20) teraPriceMax.value = 20
+  teraPriceMax.value = Math.floor(teraPriceMax.value)
+}
+
+const validateStatValue = (stat: any) => {
+  if (stat.value) {
+    // Remove decimals
+    stat.value = Math.floor(Number(stat.value)).toString()
+    
+    // Limit to 3 digits for regular stats, 4 for BST
+    const maxLength = stat.id === 'bst' ? 4 : 3
+    if (stat.value.length > maxLength) {
+      stat.value = stat.value.slice(0, maxLength)
+    }
+    
+    // Auto-enable checkbox
+    stat.enabled = true
+  } else {
+    stat.enabled = false
+  }
+}
 </script>
 
 <style scoped>
@@ -813,9 +943,9 @@ watch(teraPriceRange, (newVal) => {
   display: inline-flex;
   flex-direction: column;
   margin-left: 4px;
-  line-height: 1;
+  line-height: 0.9;
   vertical-align: middle;
-  gap: 1px;
+  gap: 0px;
 }
 
 .arrow-up {
@@ -839,5 +969,11 @@ watch(teraPriceRange, (newVal) => {
 
 :deep(.v-expansion-panel::after) {
   box-shadow: none !important;
+}
+
+/* Curved results table corners */
+:deep(.v-table) {
+  border-radius: 8px;
+  overflow: hidden;
 }
 </style>
