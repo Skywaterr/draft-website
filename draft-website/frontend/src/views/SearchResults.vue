@@ -458,7 +458,7 @@
                             height="60"
                             class="mb-1 mx-auto"
                           ></v-img>
-                          <span style="color: #000000;">Pokemon</span>
+                          <span style="color: #000000;">{{pokemon["Pokemon"]}}</span>
                         </div>
                       </td>
                       <td class="text-center">
@@ -468,13 +468,13 @@
                         </div>
                       </td>
                       <template v-if="viewMode === 'stats'">
-                        <td class="text-center" style="color: #000000;">XXX</td>
-                        <td class="text-center" style="color: #000000;">XXX</td>
-                        <td class="text-center" style="color: #000000;">XXX</td>
-                        <td class="text-center" style="color: #000000;">XXX</td>
-                        <td class="text-center" style="color: #000000;">XXX</td>
-                        <td class="text-center" style="color: #000000;">XXX</td>
-                        <td class="text-center" style="color: #000000;">XXX</td>
+                        <td class="text-center" style="color: #000000;">{{pokemon["HP"]}}</td>
+                        <td class="text-center" style="color: #000000;">{{pokemon["Atk"]}}</td>
+                        <td class="text-center" style="color: #000000;">{{pokemon["Def"]}}</td>
+                        <td class="text-center" style="color: #000000;">{{pokemon["S.At"]}}</td>
+                        <td class="text-center" style="color: #000000;">{{pokemon["S.Df"]}}</td>
+                        <td class="text-center" style="color: #000000;">{{pokemon["Spd"]}}</td>
+                        <td class="text-center" style="color: #000000;">{{pokemon["BST"]}}</td>
                       </template>
                       <template v-else>
                         <td class="text-center" style="color: #000000;">XX</td>

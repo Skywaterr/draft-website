@@ -223,7 +223,7 @@ function generateFilters(routeQuery) {
 function buildQuery(filters, args) {
     // Using what is returned in req.query from the request route,
     // make an SQL query from it with the appropriate filters
-    let sql = `SELECT DISTINCT p.Pokemon, p.Type1, p.Type2, HP, Atk, Def, "S.At", "S.Df", Spd, BST FROM Pokemon p\n`;
+    let sql = `SELECT DISTINCT p.Name, p.Pokemon, p.Type1, p.Type2, HP, Atk, Def, "S.At", "S.Df", Spd, BST FROM Pokemon p\n`;
     var joins = [];
     const searches = [];
 
@@ -541,7 +541,7 @@ module.exports = function(app) {
 
     router.get("/names", async (req, res) => {
         try {
-            const result = await db.execute(`SELECT DISTINCT Pokemon FROM Pokemon ORDER BY Pokemon`);
+            const result = await db.execute(`SELECT DISTINCT Name, Pokemon FROM Pokemon ORDER BY Pokemon`);
             res.json(result.rows);
         } catch (err) {
             console.error(err);
