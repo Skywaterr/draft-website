@@ -448,7 +448,7 @@
                       density="compact"
                       hide-details
                       bg-color="white"
-                      style="max-width: 80px;"
+                      width="90px"
                     ></v-select>
                     <span style="color: #000000; line-height: 1; display: flex; align-items: center;">Pokémon per page</span>
                   </div>

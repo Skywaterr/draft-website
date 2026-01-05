@@ -200,7 +200,7 @@
         
         <div style="flex: 0;">
           <img
-            src="@/assets/swap-arrows.png"
+            src="/swap-arrows.png"
             alt="Swap"
             class="swap-image"
             @click="swapPokemon"
