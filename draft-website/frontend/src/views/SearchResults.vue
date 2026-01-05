@@ -487,14 +487,14 @@
                       <td class="text-center">
                         <div class="d-flex flex-column align-items-center justify-center">
                           <v-img
-                            :src="`/${pokemon.Name}.png`"
+                            :src="`/${pokemon.Name}.gif`"
                             width="60"
                             height="60"
                             class="mb-1 mx-auto"
                           >  
                             <template #error>
                               <v-img
-                                src="/unown.png"
+                                src="/${pokemon.Name}.png"
                                 width="60"
                                 height="60"
                                 alt="Unknown Pokémon"

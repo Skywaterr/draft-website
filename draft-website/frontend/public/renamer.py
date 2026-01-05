@@ -3,7 +3,7 @@
 import os
 import glob
 
-files = glob.glob("*.png");
+files = glob.glob("*");
 
 for i in range(len(files)):
     f = files[i]
