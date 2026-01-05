@@ -69,6 +69,9 @@
                       bg-color="white"
                       width="310px"
                       rounded
+                      clearable
+                      @keyup.enter="performQuickSearch"
+                      @click:clear="performQuickSearch"
                     ></v-text-field>
                   </div>
 
@@ -359,12 +362,14 @@
                                 <v-row dense>
                                   <v-col cols="6" v-for="i in 4" :key="`exact-${i}`">
                                     <v-select
+                                      v-model="typeFilters.exactType[i-1]"
                                       :items="pokemonTypes"
                                       variant="outlined"
                                       density="compact"
                                       hide-details
                                       bg-color="white"
                                       placeholder="--"
+                                      clearable
                                     ></v-select>
                                   </v-col>
                                 </v-row>
@@ -382,6 +387,7 @@
                                 <v-row dense>
                                   <v-col cols="6" v-for="i in 4" :key="`resist-${i}`">
                                     <v-select
+                                      v-model="typeFilters.resistances[i-1]"
                                       :items="pokemonTypes"
                                       variant="outlined"
                                       density="compact"
@@ -406,24 +412,28 @@
                                 <v-row dense>
                                   <v-col cols="6" v-for="i in 2" :key="`immune-${i}`">
                                     <v-select
+                                      v-model="typeFilters.immunities[i-1]"
                                       :items="pokemonTypes"
                                       variant="outlined"
                                       density="compact"
                                       hide-details
                                       bg-color="white"
                                       placeholder="--"
+                                      clearable
                                     ></v-select>
                                   </v-col>
                                 </v-row>
                                 <v-row dense>
                                   <v-col cols="6" offset="3">
                                     <v-select
+                                      v-model="typeFilters.immunities[2]"
                                       :items="pokemonTypes"
                                       variant="outlined"
                                       density="compact"
                                       hide-details
                                       bg-color="white"
                                       placeholder="--"
+                                      clearable
                                     ></v-select>
                                   </v-col>
                                 </v-row>
@@ -441,12 +451,14 @@
                                 <v-row dense>
                                   <v-col cols="6" v-for="i in 4" :key="`not-${i}`">
                                     <v-select
+                                      v-model="typeFilters.notThese[i-1]"
                                       :items="pokemonTypes"
                                       variant="outlined"
                                       density="compact"
                                       hide-details
                                       bg-color="white"
                                       placeholder="--"
+                                      clearable
                                     ></v-select>
                                   </v-col>
                                 </v-row>
@@ -625,6 +637,14 @@ const teraPriceRange = ref([1, 20])
 const selectedTiers = ref<string[]>([])
 const selectedTeraTypes = ref<number[]>([])
 
+// Type filters - matching sidebar structure
+const typeFilters = ref({
+  exactType: [null, null, null, null],
+  resistances: [null, null, null, null],
+  immunities: [null, null, null],
+  notThese: [null, null, null, null]
+})
+
 // Expansion panels state
 const openPanels = ref({
   price: [],
@@ -724,6 +744,182 @@ const prevPage = () => {
   }
 }
 
+const nextPage = () => {
+  if (currentPage.value < totalPages.value) {
+    currentPage.value++
+  }
+}
+
+// Operator mapping
+const operatorMap: Record<string, string> = {
+  'At Least (≥)': 'gte',
+  'More Than (>)': 'gt',
+  'Exactly (=)': 'eq',
+  'Less Than (<)': 'lt',
+  'At Most (≤)': 'lte'
+}
+
+const operatorMapReverse: Record<string, string> = {
+  'gte': 'At Least (≥)',
+  'gt': 'More Than (>)',
+  'eq': 'Exactly (=)',
+  'lt': 'Less Than (<)',
+  'lte': 'At Most (≤)'
+}
+
+// Stat field mapping
+const statFieldMap: Record<string, string> = {
+  'hp': 'hp',
+  'attack': 'atk',
+  'defense': 'def',
+  'spattack': 's.at',
+  'spdefense': 's.df',
+  'speed': 'spd',
+  'bst': 'bst'
+}
+
+const statFieldMapReverse: Record<string, string> = {
+  'hp': 'hp',
+  'atk': 'attack',
+  'def': 'defense',
+  's.at': 'spattack',
+  's.df': 'spdefense',
+  'spd': 'speed',
+  'bst': 'bst'
+}
+
+// Debounce helper
+let debounceTimeout: ReturnType<typeof setTimeout>
+const debounce = (fn: Function, delay: number) => {
+  return (...args: any[]) => {
+    clearTimeout(debounceTimeout)
+    debounceTimeout = setTimeout(() => fn(...args), delay)
+  }
+}
+
+// Parse URL params and populate sidebar
+const populateFiltersFromURL = () => {
+  const params = new URLSearchParams(window.location.search)
+  
+  console.log('🔍 Parsing URL params:', params.toString())
+  
+  // Parse quick search / name
+  const name = params.get('name')
+  if (name) {
+    quickSearch.value = name
+  }
+  
+  // Parse stats (hp[gte]=100)
+  baseStats.value.forEach(stat => {
+    const backendField = statFieldMap[stat.id]
+    
+    // Check all operators
+    for (const [uiOp, backendOp] of Object.entries(operatorMap)) {
+      const paramKey = `${backendField}[${backendOp}]`
+      const value = params.get(paramKey)
+      
+      if (value) {
+        stat.enabled = true
+        stat.operator = uiOp
+        stat.value = value
+        console.log(`✅ Loaded stat: ${stat.label} ${uiOp} ${value}`)
+        break
+      }
+    }
+  })
+  
+  // Parse type filters
+  const exactTypes = params.getAll('type')
+  if (exactTypes.length > 0) {
+    exactTypes.forEach((type, index) => {
+      if (index < 4) typeFilters.value.exactType[index] = type as any
+    })
+    console.log('✅ Loaded exact types:', exactTypes)
+  }
+  
+  const resistTypes = params.getAll('resist')
+  if (resistTypes.length > 0) {
+    resistTypes.forEach((type, index) => {
+      if (index < 4) typeFilters.value.resistances[index] = type as any
+    })
+    console.log('✅ Loaded resist types:', resistTypes)
+  }
+  
+  const immuneTypes = params.getAll('immune')
+  if (immuneTypes.length > 0) {
+    immuneTypes.forEach((type, index) => {
+      if (index < 3) typeFilters.value.immunities[index] = type as any
+    })
+    console.log('✅ Loaded immune types:', immuneTypes)
+  }
+  
+  const notTypes = params.getAll('nottype')
+  if (notTypes.length > 0) {
+    notTypes.forEach((type, index) => {
+      if (index < 4) typeFilters.value.notThese[index] = type as any
+    })
+    console.log('✅ Loaded not types:', notTypes)
+  }
+}
+
+// Build query params from sidebar
+const buildQueryFromSidebar = () => {
+  const params = new URLSearchParams()
+  
+  // Add name/quick search
+  if (quickSearch.value.trim()) {
+    params.append('name', quickSearch.value.trim())
+  }
+  
+  // Build stat filters
+  baseStats.value.forEach(stat => {
+    if (stat.enabled && stat.value) {
+      const backendField = statFieldMap[stat.id]
+      const backendOp = operatorMap[stat.operator]
+      params.append(`${backendField}[${backendOp}]`, stat.value)
+    }
+  })
+  
+  // Build type filters - Exact Type
+  const hasExactTypes = typeFilters.value.exactType.some(t => t !== '')
+  if (hasExactTypes) {
+    params.append('exact', '') // Add exact flag
+    typeFilters.value.exactType.forEach(type => {
+      if (type) params.append('type', type)
+    })
+  }
+  
+  // Build type filters - Resistances
+  typeFilters.value.resistances.forEach(type => {
+    if (type) params.append('resist', type)
+  })
+  
+  // Build type filters - Immunities
+  typeFilters.value.immunities.forEach(type => {
+    if (type) params.append('immune', type)
+  })
+  
+  // Build type filters - NOT These
+  typeFilters.value.notThese.forEach(type => {
+    if (type) params.append('nottype', type)
+  })
+  
+  return params.toString()
+}
+
+// Update search from sidebar changes
+const updateSearchFromSidebar = debounce(() => {
+  const queryString = buildQueryFromSidebar()
+  
+  console.log('🔄 Updating search with:', queryString)
+  
+  // Update URL without reloading page
+  router.replace(`/search/results?${queryString}`)
+  
+  // Refetch results
+  fetchResults()
+}, 500) // 500ms debounce
+
 // Fetch results from backend
 const fetchResults = async () => {
   try {
@@ -731,10 +927,9 @@ const fetchResults = async () => {
     error.value = null
     
     // Get query parameters from URL
-    const queryString = route.fullPath.split('?')[1] || ''
+    const queryString = window.location.search.substring(1)
     
     if (!queryString) {
-      // No search parameters - show message
       error.value = 'No search parameters provided. Please use the search page to find Pokemon.'
       allResults.value = []
       return
@@ -765,21 +960,38 @@ const fetchResults = async () => {
   }
 }
 
-// Watch for route changes (new searches)
+// Quick search handler (like SimpleSearch)
+const performQuickSearch = () => {
+  if (quickSearch.value.trim()) {
+    updateSearchFromSidebar()
+  }
+}
+
+// Watch for route changes (e.g., back/forward buttons)
 watch(() => route.query, () => {
+  populateFiltersFromURL()
   fetchResults()
 })
+
+// Watch sidebar filter changes
+watch(baseStats, () => {
+  updateSearchFromSidebar()
+}, { deep: true })
+
+watch([draftPriceRange, teraPriceRange, selectedTiers, selectedTeraTypes], () => {
+  // TODO: Implement draft price/tera price backend integration
+  console.log('📊 Draft/Tera prices changed (not yet integrated with backend)')
+})
+
+watch(typeFilters, () => {
+  updateSearchFromSidebar()
+}, { deep: true })
 
 // Fetch on mount
 onMounted(() => {
+  populateFiltersFromURL()
   fetchResults()
 })
-
-const nextPage = () => {
-  if (currentPage.value < totalPages.value) {
-    currentPage.value++
-  }
-}
 
 const sortByColumn = (key: string) => {
   // TODO: Implement sorting
@@ -835,7 +1047,6 @@ watch(teraPriceRange, (newVal) => {
 
 const onlyNumbers = (event: KeyboardEvent) => {
   const char = event.key
-  // Allow only digits 0-9
   if (!/^\d$/.test(char)) {
     event.preventDefault()
   }
@@ -867,16 +1078,13 @@ const validateTeraPriceMax = () => {
 
 const validateStatValue = (stat: any) => {
   if (stat.value) {
-    // Remove decimals
     stat.value = Math.floor(Number(stat.value)).toString()
     
-    // Limit to 3 digits for regular stats, 4 for BST
     const maxLength = stat.id === 'bst' ? 4 : 3
     if (stat.value.length > maxLength) {
       stat.value = stat.value.slice(0, maxLength)
     }
     
-    // Auto-enable checkbox
     stat.enabled = true
   } else {
     stat.enabled = false
