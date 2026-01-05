@@ -647,10 +647,22 @@
                 class="type-dropdown"
                 @update:model-value="autoEnableTypeCheckbox('immuneTo')"
               ></v-select>
+              <div style="flex: 0.5 1 0; min-width: 55px;"></div>
               <v-select
-                v-for="i in 2"
-                :key="`immune-${i}`"
-                v-model="filters.typeFilters.immuneTo.types[i-1]"
+                v-model="filters.typeFilters.immuneTo.types[0]"
+                :items="pokemonTypes"
+                variant="outlined"
+                density="compact"
+                hide-details
+                bg-color="white"
+                placeholder="--"
+                clearable
+                class="type-dropdown"
+                @update:model-value="autoEnableTypeCheckbox('immuneTo')"
+              ></v-select>
+              <div style="flex: 0.5 1 0; min-width: 55px;"></div>
+              <v-select
+                v-model="filters.typeFilters.immuneTo.types[1]"
                 :items="pokemonTypes"
                 variant="outlined"
                 density="compact"
