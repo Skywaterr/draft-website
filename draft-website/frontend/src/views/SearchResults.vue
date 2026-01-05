@@ -8,10 +8,10 @@
       <v-container fluid class="py-8">
         <v-card elevation="0" style="background-color: #A0FFB5; border-radius: 12px; min-height: 85vh;">
           <v-card-text class="pa-6">
+            <!-- First Row: Back Buttons and Title/Toggle/Search -->
             <v-row>
-              <!-- Left Column - Back Buttons and Sidebar -->
+              <!-- Left Column - Back Buttons only -->
               <v-col cols="12" md="3">
-                <!-- Back Buttons - Stacked at top left -->
                 <div class="d-flex flex-column ga-2 mb-4">
                   <v-btn
                     style="background-color: #FFFCAD; color: #000000; text-transform: none !important; justify-content: flex-start; padding-left: 12px; width: fit-content;"
@@ -30,346 +30,9 @@
                     ← Back to Advanced Search!
                   </v-btn>
                 </div>
-
-                <!-- Filter Panel Container - Same height as table -->
-                <div style="background-color: #E0E0E0; padding: 16px; border-radius: 0; display: flex; flex-direction: column;">
-                  <div class="d-flex flex-column">
-
-                <!-- Price Filter -->
-                <v-expansion-panels class="mb-3" v-model="openPanels.price" style="background-color: transparent;">
-                  <v-expansion-panel style="background-color: transparent; box-shadow: none;">
-                    <v-expansion-panel-title style="background-color: transparent; min-height: 40px;">
-                      <span class="font-weight-bold" style="color: #000000;">Price</span>
-                    </v-expansion-panel-title>
-                    <v-expansion-panel-text style="background-color: transparent;">
-                      <!-- Draft Price - One liner with inputs -->
-                      <div class="d-flex align-items-center ga-2 mb-2 flex-wrap">
-                        <span style="color: #000000; white-space: nowrap; line-height: 1; display: flex; align-items: center;">Draft Price:</span>
-                        <v-text-field
-                          v-model.number="draftPriceMin"
-                          placeholder="Number Here"
-                          variant="outlined"
-                          density="compact"
-                          hide-details
-                          bg-color="white"
-                          type="number"
-                          :min="1"
-                          :max="26"
-                          style="max-width: 70px;"
-                          @input="validateDraftPriceMin"
-                          @keypress="onlyNumbers"
-                        ></v-text-field>
-                        <span style="color: #000000; line-height: 1; display: flex; align-items: center;">to</span>
-                        <v-text-field
-                          v-model.number="draftPriceMax"
-                          placeholder="Number Here"
-                          variant="outlined"
-                          density="compact"
-                          hide-details
-                          bg-color="white"
-                          type="number"
-                          :min="1"
-                          :max="26"
-                          style="max-width: 70px;"
-                          @input="validateDraftPriceMax"
-                          @keypress="onlyNumbers"
-                        ></v-text-field>
-                      </div>
-
-                      <!-- Draft Price Slider -->
-                      <v-range-slider
-                        v-model="draftPriceRange"
-                        :min="1"
-                        :max="26"
-                        :step="1"
-                        strict
-                        show-ticks="always"
-                        tick-size="4"
-                        thumb-label
-                        color="#133AFF"
-                        track-color="rgba(0,0,0,0.2)"
-                        thumb-color="white"
-                        class="mt-2"
-                        style="margin-bottom: -25px;"
-                      >
-                        <template v-slot:prepend>
-                          <div class="text-caption" style="color: #000000;">1</div>
-                        </template>
-                        <template v-slot:append>
-                          <div class="text-caption" style="color: #000000;">26</div>
-                        </template>
-                      </v-range-slider>
-
-                      <!-- Tier Checkboxes -->
-                      <div class="mb-3">
-                        <v-row dense>
-                          <v-col cols="4" v-for="tier in ['S-tier', 'A-tier', 'B-tier']" :key="tier">
-                            <v-checkbox
-                              v-model="selectedTiers"
-                              :value="tier"
-                              :label="tier"
-                              hide-details
-                              density="compact"
-                              color="#000000"
-                            ></v-checkbox>
-                          </v-col>
-                        </v-row>
-                        <v-row dense>
-                          <v-col cols="4" v-for="tier in ['C-tier', 'D-tier', 'E-tier']" :key="tier">
-                            <v-checkbox
-                              v-model="selectedTiers"
-                              :value="tier"
-                              :label="tier"
-                              hide-details
-                              density="compact"
-                              color="#000000"
-                            ></v-checkbox>
-                          </v-col>
-                        </v-row>
-                      </div>
-
-                      <!-- Tera Price -->
-                      <div class="d-flex align-items-center ga-2 mb-2 flex-wrap">
-                        <span style="color: #000000; white-space: nowrap; line-height: 1; display: flex; align-items: center;">Tera Price:</span>
-                        <v-text-field
-                          v-model.number="teraPriceMin"
-                          placeholder="Number Here"
-                          variant="outlined"
-                          density="compact"
-                          hide-details
-                          bg-color="white"
-                          type="number"
-                          :min="1"
-                          :max="20"
-                          style="max-width: 70px;"
-                          @input="validateTeraPriceMin"
-                          @keypress="onlyNumbers"
-                        ></v-text-field>
-                        <span style="color: #000000; line-height: 1; display: flex; align-items: center;">to</span>
-                        <v-text-field
-                          v-model.number="teraPriceMax"
-                          placeholder="Number Here"
-                          variant="outlined"
-                          density="compact"
-                          hide-details
-                          bg-color="white"
-                          type="number"
-                          :min="1"
-                          :max="20"
-                          style="max-width: 70px;"
-                          @input="validateTeraPriceMax"
-                          @keypress="onlyNumbers"
-                        ></v-text-field>
-                      </div>
-
-                      <!-- Tera Price Slider -->
-                      <v-range-slider
-                        v-model="teraPriceRange"
-                        :min="1"
-                        :max="20"
-                        :step="1"
-                        strict
-                        show-ticks="always"
-                        tick-size="4"
-                        thumb-label
-                        color="#133AFF"
-                        track-color="rgba(0,0,0,0.2)"
-                        thumb-color="white"
-                        class="mt-2"
-                        style="margin-bottom: -25px;"
-                      >
-                        <template v-slot:prepend>
-                          <div class="text-caption" style="color: #000000;">1</div>
-                        </template>
-                        <template v-slot:append>
-                          <div class="text-caption" style="color: #000000;">20</div>
-                        </template>
-                      </v-range-slider>
-
-                      <!-- Tera Types Checkboxes -->
-                      <div class="d-flex ga-1 flex-nowrap" style="margin-left: -10px; width: calc(100% + 30px);">
-                        <v-checkbox
-                          v-for="num in [1, 2, 3, 4]"
-                          :key="num"
-                          v-model="selectedTeraTypes"
-                          :value="num"
-                          :label="`${num} Type${num > 1 ? 's' : ''}`"
-                          hide-details
-                          density="compact"
-                          color="#000000"
-                          style="margin-right: 2px;"
-                        ></v-checkbox>
-                      </div>
-                    </v-expansion-panel-text>
-                  </v-expansion-panel>
-                </v-expansion-panels>
-
-<!-- Base Stats Filter -->
-                <v-expansion-panels class="mb-3" v-model="openPanels.stats" style="background-color: transparent;">
-                  <v-expansion-panel style="background-color: transparent; box-shadow: none;">
-                    <v-expansion-panel-title style="background-color: transparent; min-height: 40px;">
-                      <span class="font-weight-bold" style="color: #000000;">Base Stats</span>
-                    </v-expansion-panel-title>
-                    <v-expansion-panel-text style="background-color: transparent;">
-                      <div class="d-flex flex-column ga-2">
-                        <div
-                          v-for="stat in baseStats"
-                          :key="stat.id"
-                          class="d-flex align-items-center ga-2"
-                        >
-                          <v-checkbox 
-                            v-model="stat.enabled" 
-                            hide-details 
-                            density="compact" 
-                            color="#000000" 
-                            style="flex-shrink: 0;"
-                          ></v-checkbox>
-                          <span style="min-width: 60px; font-size: 0.875rem; color: #000000; line-height: 1; display: flex; align-items: center;">{{ stat.label }}:</span>
-                          <v-select
-                            v-model="stat.operator"
-                            :items="operators"
-                            variant="outlined"
-                            density="compact"
-                            hide-details
-                            bg-color="white"
-                            style="max-width: 200px; font-size: 0.75rem;"
-                          ></v-select>
-                          <v-text-field
-                            v-model="stat.value"
-                            placeholder="###"
-                            variant="outlined"
-                            density="compact"
-                            hide-details
-                            bg-color="white"
-                            type="number"
-                            style="max-width: 70px;"
-                            @input="validateStatValue(stat)"
-                            @keypress="onlyNumbers"
-                          ></v-text-field>
-                        </div>
-                      </div>
-                    </v-expansion-panel-text>
-                  </v-expansion-panel>
-                </v-expansion-panels>
-
-                <!-- Types Filter -->
-                <v-expansion-panels class="mb-3" v-model="openPanels.types" style="background-color: transparent;">
-                  <v-expansion-panel style="background-color: transparent; box-shadow: none;">
-                    <v-expansion-panel-title style="background-color: transparent; min-height: 40px;">
-                      <span class="font-weight-bold" style="color: #000000;">Types</span>
-                    </v-expansion-panel-title>
-                    <v-expansion-panel-text style="background-color: transparent;">
-                      <!-- Exact Type -->
-                      <v-expansion-panels class="mb-2" style="background-color: transparent;">
-                        <v-expansion-panel style="background-color: transparent; box-shadow: none;">
-                          <v-expansion-panel-title class="pa-2" style="min-height: 36px; background-color: transparent;">
-                            <span class="font-weight-bold" style="font-size: 0.875rem; color: #000000;">Exact Type</span>
-                          </v-expansion-panel-title>
-                          <v-expansion-panel-text style="background-color: transparent;">
-                            <v-row dense>
-                              <v-col cols="6" v-for="i in 4" :key="`exact-${i}`">
-                                <v-select
-                                  :items="pokemonTypes"
-                                  variant="outlined"
-                                  density="compact"
-                                  hide-details
-                                  bg-color="white"
-                                  placeholder="--"
-                                ></v-select>
-                              </v-col>
-                            </v-row>
-                          </v-expansion-panel-text>
-                        </v-expansion-panel>
-                      </v-expansion-panels>
-
-                      <!-- Resistances -->
-                      <v-expansion-panels class="mb-2" style="background-color: transparent;">
-                        <v-expansion-panel style="background-color: transparent; box-shadow: none;">
-                          <v-expansion-panel-title class="pa-2" style="min-height: 36px; background-color: transparent;">
-                            <span class="font-weight-bold" style="font-size: 0.875rem; color: #000000;">Resistances</span>
-                          </v-expansion-panel-title>
-                          <v-expansion-panel-text style="background-color: transparent;">
-                            <v-row dense>
-                              <v-col cols="6" v-for="i in 4" :key="`resist-${i}`">
-                                <v-select
-                                  :items="pokemonTypes"
-                                  variant="outlined"
-                                  density="compact"
-                                  hide-details
-                                  bg-color="white"
-                                  placeholder="--"
-                                ></v-select>
-                              </v-col>
-                            </v-row>
-                          </v-expansion-panel-text>
-                        </v-expansion-panel>
-                      </v-expansion-panels>
-
-                      <!-- Immunities -->
-                      <v-expansion-panels class="mb-2" style="background-color: transparent;">
-                        <v-expansion-panel style="background-color: transparent; box-shadow: none;">
-                          <v-expansion-panel-title class="pa-2" style="min-height: 36px; background-color: transparent;">
-                            <span class="font-weight-bold" style="font-size: 0.875rem; color: #000000;">Immunities</span>
-                          </v-expansion-panel-title>
-                          <v-expansion-panel-text style="background-color: transparent;">
-                            <v-row dense>
-                              <v-col cols="6" v-for="i in 2" :key="`immune-${i}`">
-                                <v-select
-                                  :items="pokemonTypes"
-                                  variant="outlined"
-                                  density="compact"
-                                  hide-details
-                                  bg-color="white"
-                                  placeholder="--"
-                                ></v-select>
-                              </v-col>
-                            </v-row>
-                            <v-row dense>
-                              <v-col cols="6" offset="3">
-                                <v-select
-                                  :items="pokemonTypes"
-                                  variant="outlined"
-                                  density="compact"
-                                  hide-details
-                                  bg-color="white"
-                                  placeholder="--"
-                                ></v-select>
-                              </v-col>
-                            </v-row>
-                          </v-expansion-panel-text>
-                        </v-expansion-panel>
-                      </v-expansion-panels>
-
-                      <!-- NOT this type -->
-                      <v-expansion-panels style="background-color: transparent;">
-                        <v-expansion-panel style="background-color: transparent; box-shadow: none;">
-                          <v-expansion-panel-title class="pa-2" style="min-height: 36px; background-color: transparent;">
-                            <span class="font-weight-bold" style="font-size: 0.875rem; color: #000000;">NOT this type</span>
-                          </v-expansion-panel-title>
-                          <v-expansion-panel-text style="background-color: transparent;">
-                            <v-row dense>
-                              <v-col cols="6" v-for="i in 4" :key="`not-${i}`">
-                                <v-select
-                                  :items="pokemonTypes"
-                                  variant="outlined"
-                                  density="compact"
-                                  hide-details
-                                  bg-color="white"
-                                  placeholder="--"
-                                ></v-select>
-                              </v-col>
-                            </v-row>
-                          </v-expansion-panel-text>
-                        </v-expansion-panel>
-                      </v-expansion-panels>
-                    </v-expansion-panel-text>
-                  </v-expansion-panel>
-                </v-expansion-panels>
-              </div>
-            </div>
               </v-col>
 
-              <!-- Main Content Area -->
+              <!-- Right Column - Title, Toggle, Search -->
               <v-col cols="12" md="9">
                 <h1 class="text-h3 text-center mb-4" style="color: #000000;">Search Results!</h1>
 
@@ -393,7 +56,7 @@
                   </v-btn-toggle>
                 </div>
 
-<!-- Quick Search and Pagination Row -->
+                <!-- Quick Search and Pagination Row -->
                 <div class="d-flex justify-space-between align-items-center mb-4 flex-wrap ga-3">
                   <div class="d-flex align-items-center ga-2">
                     <span style="color: #000000; line-height: 1; display: flex; align-items: center;">Quick Search:</span>
@@ -453,9 +116,351 @@
                     <span style="color: #000000; line-height: 1; display: flex; align-items: center;">Pokémon per page</span>
                   </div>
                 </div>
+              </v-col>
+            </v-row>
 
-                <!-- Results Table -->
+            <!-- Second Row: Sidebar + Table -->
+            <v-row class="mt-n8">
+              <!-- Left Column - Filter Sidebar -->
+              <v-col cols="12" md="3">
+                <div style="background-color: #E0E0E0; padding: 16px; border-radius: 0; display: flex; flex-direction: column;">
+                  <div class="d-flex flex-column">
+                    <!-- Price Filter -->
+                    <v-expansion-panels class="mb-3" v-model="openPanels.price" style="background-color: transparent;">
+                      <v-expansion-panel style="background-color: transparent; box-shadow: none;">
+                        <v-expansion-panel-title style="background-color: transparent; min-height: 40px;">
+                          <span class="font-weight-bold" style="color: #000000;">Price</span>
+                        </v-expansion-panel-title>
+                        <v-expansion-panel-text style="background-color: transparent;">
+                          <!-- Draft Price - One liner with inputs -->
+                          <div class="d-flex align-items-center ga-2 mb-2 flex-wrap">
+                            <span style="color: #000000; white-space: nowrap; line-height: 1; display: flex; align-items: center;">Draft Price:</span>
+                            <v-text-field
+                              v-model.number="draftPriceMin"
+                              placeholder="Number Here"
+                              variant="outlined"
+                              density="compact"
+                              hide-details
+                              bg-color="white"
+                              type="number"
+                              :min="1"
+                              :max="26"
+                              style="max-width: 70px;"
+                              @input="validateDraftPriceMin"
+                              @keypress="onlyNumbers"
+                            ></v-text-field>
+                            <span style="color: #000000; line-height: 1; display: flex; align-items: center;">to</span>
+                            <v-text-field
+                              v-model.number="draftPriceMax"
+                              placeholder="Number Here"
+                              variant="outlined"
+                              density="compact"
+                              hide-details
+                              bg-color="white"
+                              type="number"
+                              :min="1"
+                              :max="26"
+                              style="max-width: 70px;"
+                              @input="validateDraftPriceMax"
+                              @keypress="onlyNumbers"
+                            ></v-text-field>
+                          </div>
 
+                          <!-- Draft Price Slider -->
+                          <v-range-slider
+                            v-model="draftPriceRange"
+                            :min="1"
+                            :max="26"
+                            :step="1"
+                            strict
+                            show-ticks="always"
+                            tick-size="4"
+                            thumb-label
+                            color="#133AFF"
+                            track-color="rgba(0,0,0,0.2)"
+                            thumb-color="white"
+                            class="mt-2"
+                            style="margin-bottom: -25px;"
+                          >
+                            <template v-slot:prepend>
+                              <div class="text-caption" style="color: #000000;">1</div>
+                            </template>
+                            <template v-slot:append>
+                              <div class="text-caption" style="color: #000000;">26</div>
+                            </template>
+                          </v-range-slider>
+
+                          <!-- Tier Checkboxes -->
+                          <div class="mb-3">
+                            <v-row dense>
+                              <v-col cols="4" v-for="tier in ['S-tier', 'A-tier', 'B-tier']" :key="tier">
+                                <v-checkbox
+                                  v-model="selectedTiers"
+                                  :value="tier"
+                                  :label="tier"
+                                  hide-details
+                                  density="compact"
+                                  color="#000000"
+                                ></v-checkbox>
+                              </v-col>
+                            </v-row>
+                            <v-row dense>
+                              <v-col cols="4" v-for="tier in ['C-tier', 'D-tier', 'E-tier']" :key="tier">
+                                <v-checkbox
+                                  v-model="selectedTiers"
+                                  :value="tier"
+                                  :label="tier"
+                                  hide-details
+                                  density="compact"
+                                  color="#000000"
+                                ></v-checkbox>
+                              </v-col>
+                            </v-row>
+                          </div>
+
+                          <!-- Tera Price -->
+                          <div class="d-flex align-items-center ga-2 mb-2 flex-wrap">
+                            <span style="color: #000000; white-space: nowrap; line-height: 1; display: flex; align-items: center;">Tera Price:</span>
+                            <v-text-field
+                              v-model.number="teraPriceMin"
+                              placeholder="Number Here"
+                              variant="outlined"
+                              density="compact"
+                              hide-details
+                              bg-color="white"
+                              type="number"
+                              :min="1"
+                              :max="20"
+                              style="max-width: 70px;"
+                              @input="validateTeraPriceMin"
+                              @keypress="onlyNumbers"
+                            ></v-text-field>
+                            <span style="color: #000000; line-height: 1; display: flex; align-items: center;">to</span>
+                            <v-text-field
+                              v-model.number="teraPriceMax"
+                              placeholder="Number Here"
+                              variant="outlined"
+                              density="compact"
+                              hide-details
+                              bg-color="white"
+                              type="number"
+                              :min="1"
+                              :max="20"
+                              style="max-width: 70px;"
+                              @input="validateTeraPriceMax"
+                              @keypress="onlyNumbers"
+                            ></v-text-field>
+                          </div>
+
+                          <!-- Tera Price Slider -->
+                          <v-range-slider
+                            v-model="teraPriceRange"
+                            :min="1"
+                            :max="20"
+                            :step="1"
+                            strict
+                            show-ticks="always"
+                            tick-size="4"
+                            thumb-label
+                            color="#133AFF"
+                            track-color="rgba(0,0,0,0.2)"
+                            thumb-color="white"
+                            class="mt-2"
+                            style="margin-bottom: -25px;"
+                          >
+                            <template v-slot:prepend>
+                              <div class="text-caption" style="color: #000000;">1</div>
+                            </template>
+                            <template v-slot:append>
+                              <div class="text-caption" style="color: #000000;">20</div>
+                            </template>
+                          </v-range-slider>
+
+                          <!-- Tera Types Checkboxes -->
+                          <div class="d-flex ga-1 flex-nowrap" style="margin-left: -10px; width: calc(100% + 30px);">
+                            <v-checkbox
+                              v-for="num in [1, 2, 3, 4]"
+                              :key="num"
+                              v-model="selectedTeraTypes"
+                              :value="num"
+                              :label="`${num} Type${num > 1 ? 's' : ''}`"
+                              hide-details
+                              density="compact"
+                              color="#000000"
+                              style="margin-right: 2px;"
+                            ></v-checkbox>
+                          </div>
+                        </v-expansion-panel-text>
+                      </v-expansion-panel>
+                    </v-expansion-panels>
+
+                    <!-- Base Stats Filter -->
+                    <v-expansion-panels class="mb-3" v-model="openPanels.stats" style="background-color: transparent;">
+                      <v-expansion-panel style="background-color: transparent; box-shadow: none;">
+                        <v-expansion-panel-title style="background-color: transparent; min-height: 40px;">
+                          <span class="font-weight-bold" style="color: #000000;">Base Stats</span>
+                        </v-expansion-panel-title>
+                        <v-expansion-panel-text style="background-color: transparent;">
+                          <div class="d-flex flex-column ga-2">
+                            <div
+                              v-for="stat in baseStats"
+                              :key="stat.id"
+                              class="d-flex align-items-center ga-2"
+                            >
+                              <v-checkbox 
+                                v-model="stat.enabled" 
+                                hide-details 
+                                density="compact" 
+                                color="#000000" 
+                                style="flex-shrink: 0;"
+                              ></v-checkbox>
+                              <span style="min-width: 60px; font-size: 0.875rem; color: #000000; line-height: 1; display: flex; align-items: center;">{{ stat.label }}:</span>
+                              <v-select
+                                v-model="stat.operator"
+                                :items="operators"
+                                variant="outlined"
+                                density="compact"
+                                hide-details
+                                bg-color="white"
+                                style="max-width: 200px; font-size: 0.75rem;"
+                              ></v-select>
+                              <v-text-field
+                                v-model="stat.value"
+                                placeholder="###"
+                                variant="outlined"
+                                density="compact"
+                                hide-details
+                                bg-color="white"
+                                type="number"
+                                style="max-width: 70px;"
+                                @input="validateStatValue(stat)"
+                                @keypress="onlyNumbers"
+                              ></v-text-field>
+                            </div>
+                          </div>
+                        </v-expansion-panel-text>
+                      </v-expansion-panel>
+                    </v-expansion-panels>
+
+                    <!-- Types Filter -->
+                    <v-expansion-panels class="mb-3" v-model="openPanels.types" style="background-color: transparent;">
+                      <v-expansion-panel style="background-color: transparent; box-shadow: none;">
+                        <v-expansion-panel-title style="background-color: transparent; min-height: 40px;">
+                          <span class="font-weight-bold" style="color: #000000;">Types</span>
+                        </v-expansion-panel-title>
+                        <v-expansion-panel-text style="background-color: transparent;">
+                          <!-- Exact Type -->
+                          <v-expansion-panels class="mb-2" style="background-color: transparent;">
+                            <v-expansion-panel style="background-color: transparent; box-shadow: none;">
+                              <v-expansion-panel-title class="pa-2" style="min-height: 36px; background-color: transparent;">
+                                <span class="font-weight-bold" style="font-size: 0.875rem; color: #000000;">Exact Type</span>
+                              </v-expansion-panel-title>
+                              <v-expansion-panel-text style="background-color: transparent;">
+                                <v-row dense>
+                                  <v-col cols="6" v-for="i in 4" :key="`exact-${i}`">
+                                    <v-select
+                                      :items="pokemonTypes"
+                                      variant="outlined"
+                                      density="compact"
+                                      hide-details
+                                      bg-color="white"
+                                      placeholder="--"
+                                    ></v-select>
+                                  </v-col>
+                                </v-row>
+                              </v-expansion-panel-text>
+                            </v-expansion-panel>
+                          </v-expansion-panels>
+
+                          <!-- Resistances -->
+                          <v-expansion-panels class="mb-2" style="background-color: transparent;">
+                            <v-expansion-panel style="background-color: transparent; box-shadow: none;">
+                              <v-expansion-panel-title class="pa-2" style="min-height: 36px; background-color: transparent;">
+                                <span class="font-weight-bold" style="font-size: 0.875rem; color: #000000;">Resistances</span>
+                              </v-expansion-panel-title>
+                              <v-expansion-panel-text style="background-color: transparent;">
+                                <v-row dense>
+                                  <v-col cols="6" v-for="i in 4" :key="`resist-${i}`">
+                                    <v-select
+                                      :items="pokemonTypes"
+                                      variant="outlined"
+                                      density="compact"
+                                      hide-details
+                                      bg-color="white"
+                                      placeholder="--"
+                                    ></v-select>
+                                  </v-col>
+                                </v-row>
+                              </v-expansion-panel-text>
+                            </v-expansion-panel>
+                          </v-expansion-panels>
+
+                          <!-- Immunities -->
+                          <v-expansion-panels class="mb-2" style="background-color: transparent;">
+                            <v-expansion-panel style="background-color: transparent; box-shadow: none;">
+                              <v-expansion-panel-title class="pa-2" style="min-height: 36px; background-color: transparent;">
+                                <span class="font-weight-bold" style="font-size: 0.875rem; color: #000000;">Immunities</span>
+                              </v-expansion-panel-title>
+                              <v-expansion-panel-text style="background-color: transparent;">
+                                <v-row dense>
+                                  <v-col cols="6" v-for="i in 2" :key="`immune-${i}`">
+                                    <v-select
+                                      :items="pokemonTypes"
+                                      variant="outlined"
+                                      density="compact"
+                                      hide-details
+                                      bg-color="white"
+                                      placeholder="--"
+                                    ></v-select>
+                                  </v-col>
+                                </v-row>
+                                <v-row dense>
+                                  <v-col cols="6" offset="3">
+                                    <v-select
+                                      :items="pokemonTypes"
+                                      variant="outlined"
+                                      density="compact"
+                                      hide-details
+                                      bg-color="white"
+                                      placeholder="--"
+                                    ></v-select>
+                                  </v-col>
+                                </v-row>
+                              </v-expansion-panel-text>
+                            </v-expansion-panel>
+                          </v-expansion-panels>
+
+                          <!-- NOT this type -->
+                          <v-expansion-panels style="background-color: transparent;">
+                            <v-expansion-panel style="background-color: transparent; box-shadow: none;">
+                              <v-expansion-panel-title class="pa-2" style="min-height: 36px; background-color: transparent;">
+                                <span class="font-weight-bold" style="font-size: 0.875rem; color: #000000;">NOT this type</span>
+                              </v-expansion-panel-title>
+                              <v-expansion-panel-text style="background-color: transparent;">
+                                <v-row dense>
+                                  <v-col cols="6" v-for="i in 4" :key="`not-${i}`">
+                                    <v-select
+                                      :items="pokemonTypes"
+                                      variant="outlined"
+                                      density="compact"
+                                      hide-details
+                                      bg-color="white"
+                                      placeholder="--"
+                                    ></v-select>
+                                  </v-col>
+                                </v-row>
+                              </v-expansion-panel-text>
+                            </v-expansion-panel>
+                          </v-expansion-panels>
+                        </v-expansion-panel-text>
+                      </v-expansion-panel>
+                    </v-expansion-panels>
+                  </div>
+                </div>
+              </v-col>
+
+              <!-- Right Column - Results Table -->
+              <v-col cols="12" md="9">
                 <!-- Results Table -->
                 <v-table style="background-color: transparent;">
                   <thead>
@@ -494,7 +499,7 @@
                           >  
                             <template #error>
                               <v-img
-                                src="/${pokemon.Name}.png"
+                                :src="`/${pokemon.Name}.png`"
                                 width="60"
                                 height="60"
                                 alt="Unknown Pokémon"
@@ -644,14 +649,6 @@ const baseStats = ref([
   { id: 'bst', label: 'BST', enabled: false, operator: 'At Least (≥)', value: '' }
 ])
 
-const autoEnableStatCheckbox = (stat: any) => {
-  if (stat.value) {
-    stat.enabled = true
-  } else {
-    stat.enabled = false
-  }
-}
-
 const pokemonTypes = [
   'Normal', 'Fire', 'Water', 'Grass', 'Electric', 'Ice',
   'Fighting', 'Poison', 'Ground', 'Flying', 'Psychic', 'Bug',
@@ -678,7 +675,6 @@ const typeColors = {
   'Steel': "#A8B1B3",
   'Fairy': "#E0ABE0",
 }
-
 
 // Headers
 const statsHeaders = [
@@ -787,21 +783,6 @@ const nextPage = () => {
 const sortByColumn = (key: string) => {
   // TODO: Implement sorting
   console.log('Sort by:', key)
-}
-
-const getHeaderStyle = (key: string) => {
-  // Fixed width for #, Pokemon, Type columns in both views
-  const fixedColumns = ['number', 'pokemon', 'type']
-  
-  if (fixedColumns.includes(key)) {
-    return 'color: #000000; cursor: pointer; width: auto;'
-  }
-  return 'color: #000000; cursor: pointer;'
-}
-
-const getCellStyle = (columnName: string, index: number) => {
-  const baseColor = index % 2 === 0 ? '#A5D9AB' : '#D7FFDC'
-  return `color: #000000; background-color: ${baseColor};`
 }
 
 const goToAdvancedSearch = () => {
@@ -934,7 +915,7 @@ const validateStatValue = (stat: any) => {
   padding-right: 4px !important;
 }
 
-/* Sort arrows styling - spread out */
+/* Sort arrows styling */
 .sort-arrows {
   display: inline-flex;
   flex-direction: column;
