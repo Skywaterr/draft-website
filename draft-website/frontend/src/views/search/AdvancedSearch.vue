@@ -110,7 +110,7 @@
             </v-range-slider>
           </div>
 
-          <v-divider class="my-2 aligned-divider" color="rgba(0,0,0,0.3)"></v-divider>
+          <v-divider class="my-2 aligned-divider" color="rgba(0,0,0,0.3)" thickness="3"></v-divider>
 
           <!-- Tier Selection Option -->
           <div>
@@ -225,7 +225,7 @@
             </v-range-slider>
           </div>
 
-          <v-divider class="my-4 aligned-divider" color="rgba(0,0,0,0.3)"></v-divider>
+          <v-divider class="my-4 aligned-divider" color="rgba(0,0,0,0.3)" thickness="3"></v-divider>
 
           <!-- Tera Types Count Option -->
           <div>
@@ -269,7 +269,7 @@
         </fieldset>
       </v-col>
 
-<!-- Base Stats Section -->
+      <!-- Base Stats Section -->
       <v-col cols="12">
         <fieldset class="filter-section pa-4">
           <legend class="text-h6 px-2">Base Stats</legend>
@@ -402,7 +402,7 @@
                   <v-autocomplete
                     v-model="move.name"
                     :items="moveNames"
-                    placeholder="Move Name"
+                    label="Move Name"
                     variant="outlined"
                     density="compact"
                     hide-details
@@ -415,7 +415,7 @@
             </v-row>
           </div>
 
-          <v-divider class="my-2" color="rgba(0,0,0,0.3)"></v-divider>
+          <v-divider class="my-2" color="rgba(0,0,0,0.3)" thickness="3"></v-divider>
 
           <!-- Learns an attacking move that is... -->
           <div>
@@ -438,9 +438,10 @@
                   density="compact"
                   hide-details
                   bg-color="white"
-                  :clearable="!!filters.moveType.value"
+                  clearable
                   placeholder="--"
-                  style="max-width: 150px;"
+                  width="160px"
+                  style="max-width: 160px; margin-left: 19px;"
                   @update:model-value="autoEnableMoveTypeCheckbox"
                 ></v-select>
               </div>
@@ -461,9 +462,9 @@
                   density="compact"
                   hide-details
                   bg-color="white"
-                  :clearable="!!filters.moveCategory.value"
+                  clearable
                   placeholder="--"
-                  style="max-width: 160px;"
+                  style="max-width: 160px; margin-left: 19px;"
                   @update:model-value="autoEnableMoveCategoryCheckbox"
                 ></v-select>
               </div>
@@ -519,6 +520,7 @@
                   hide-details
                   bg-color="white"
                   class="operator-select"
+                  style="margin-left: 19px;"
                   @update:model-value="autoEnableMoveAccuracyCheckbox"
                 ></v-select>
                 <v-text-field
@@ -573,7 +575,7 @@
                 hide-details
                 bg-color="white"
                 placeholder="--"
-                :clearable="!!filters.typeFilters.exactlyThese.types[i-1]"
+                clearable
                 class="type-dropdown"
                 @update:model-value="autoEnableTypeCheckbox('exactlyThese')"
               ></v-select>
@@ -588,13 +590,16 @@
                 color="#000000"
                 style="flex: 0 0 auto;"
               ></v-checkbox>
-              <v-chip 
-                style="background-color: #AFFFA5; color: #000000;" 
-                size="small"
-                class="type-label-chip"
-              >
-                Resists
-              </v-chip>
+              <v-select
+                :model-value="'Resists'"
+                :items="['Resists']"
+                variant="outlined"
+                density="compact"
+                hide-details
+                bg-color="#AFFFA5"
+                readonly
+                class="type-label-select no-arrow"
+              ></v-select>
               <v-select
                 v-for="i in 4"
                 :key="`resist-${i}`"
@@ -605,7 +610,7 @@
                 hide-details
                 bg-color="white"
                 placeholder="--"
-                :clearable="!!filters.typeFilters.resists.types[i-1]"
+                clearable
                 class="type-dropdown"
                 @update:model-value="autoEnableTypeCheckbox('resists')"
               ></v-select>
@@ -620,25 +625,28 @@
                 color="#000000"
                 style="flex: 0 0 auto;"
               ></v-checkbox>
-              <v-chip 
-                style="background-color: #AFFFA5; color: #000000;" 
-                size="small"
-                class="type-label-chip"
-              >
-                Immune To
-              </v-chip>
-              <v-autocomplete
+              <v-select
+                :model-value="'Immune To'"
+                :items="['Immune To']"
+                variant="outlined"
+                density="compact"
+                hide-details
+                bg-color="#AFFFA5"
+                readonly
+                class="type-label-select no-arrow"
+              ></v-select>
+              <v-select
                 v-model="filters.typeFilters.immuneTo.searchType"
                 :items="pokemonTypes"
                 variant="outlined"
                 density="compact"
                 hide-details
                 bg-color="white"
-                placeholder="Type to search"
-                :clearable="!!filters.typeFilters.immuneTo.searchType"
-                class="type-dropdown-search"
+                placeholder="--"
+                clearable
+                class="type-dropdown"
                 @update:model-value="autoEnableTypeCheckbox('immuneTo')"
-              ></v-autocomplete>
+              ></v-select>
               <v-select
                 v-for="i in 2"
                 :key="`immune-${i}`"
@@ -649,7 +657,7 @@
                 hide-details
                 bg-color="white"
                 placeholder="--"
-                :clearable="!!filters.typeFilters.immuneTo.types[i-1]"
+                clearable
                 class="type-dropdown"
                 @update:model-value="autoEnableTypeCheckbox('immuneTo')"
               ></v-select>
@@ -664,13 +672,16 @@
                 color="#000000"
                 style="flex: 0 0 auto;"
               ></v-checkbox>
-              <v-chip 
-                style="background-color: #FFBFBF; color: #000000;" 
-                size="small"
-                class="type-label-chip"
-              >
-                NOT These
-              </v-chip>
+              <v-select
+                :model-value="'NOT These'"
+                :items="['NOT These']"
+                variant="outlined"
+                density="compact"
+                hide-details
+                bg-color="#FFBFBF"
+                readonly
+                class="type-label-select no-arrow"
+              ></v-select>
               <v-select
                 v-for="i in 4"
                 :key="`not-${i}`"
@@ -681,7 +692,7 @@
                 hide-details
                 bg-color="white"
                 placeholder="--"
-                :clearable="!!filters.typeFilters.notThese.types[i-1]"
+                clearable
                 class="type-dropdown"
                 @update:model-value="autoEnableTypeCheckbox('notThese')"
               ></v-select>
@@ -824,19 +835,19 @@ const filters = ref({
   bstValue: '',
   
   abilityEnabled: false,
-  abilityName: '',
+  abilityName: null,
   
   moves: [
-    { enabled: false, name: '' },
-    { enabled: false, name: '' },
-    { enabled: false, name: '' },
-    { enabled: false, name: '' },
-    { enabled: false, name: '' },
-    { enabled: false, name: '' },
+    { enabled: false, name: null },
+    { enabled: false, name: null },
+    { enabled: false, name: null },
+    { enabled: false, name: null },
+    { enabled: false, name: null },
+    { enabled: false, name: null },
   ],
   
-  moveType: { enabled: false, value: '' },
-  moveCategory: { enabled: false, value: '' },
+  moveType: { enabled: false, value: null },
+  moveCategory: { enabled: false, value: null },
   movePower: { enabled: false, min: '', max: '' },
   moveAccuracy: { enabled: false, operator: 'At Least (≥)', value: '' },
   
@@ -844,20 +855,20 @@ const filters = ref({
     exactlyThese: {
       enabled: false,
       mode: 'Exactly These',
-      types: ['', '', '', '']
+      types: [null, null, null, null]
     },
     resists: {
       enabled: false,
-      types: ['', '', '', '']
+      types: [null, null, null, null]
     },
     immuneTo: {
       enabled: false,
-      searchType: '',
-      types: ['', '']
+      searchType: null,
+      types: [null, null]
     },
     notThese: {
       enabled: false,
-      types: ['', '', '', '']
+      types: [null, null, null, null]
     }
   }
 })
@@ -1004,7 +1015,7 @@ const autoEnableTypeCheckbox = (filterName: string) => {
   let hasValue = false
 
   if ('types' in filter) {
-    hasValue = filter.types.some((t: string) => t !== '')
+    hasValue = filter.types.some((t: string | null) => t !== null && t !== '')
   }
   if ('searchType' in filter && filter.searchType) {
     hasValue = true
@@ -1138,22 +1149,22 @@ const resetAllFilters = () => {
   filters.value.bstValue = ''
 
   filters.value.abilityEnabled = false
-  filters.value.abilityName = ''
+  filters.value.abilityName = null
 
   filters.value.moves.forEach(move => {
     move.enabled = false
-    move.name = ''
+    move.name = null
   })
-  filters.value.moveType = { enabled: false, value: '' }
-  filters.value.moveCategory = { enabled: false, value: '' }
+  filters.value.moveType = { enabled: false, value: null }
+  filters.value.moveCategory = { enabled: false, value: null }
   filters.value.movePower = { enabled: false, min: '', max: '' }
   filters.value.moveAccuracy = { enabled: false, operator: 'At Least (≥)', value: '' }
 
   filters.value.typeFilters = {
-    exactlyThese: { enabled: false, mode: 'Exactly These', types: ['', '', '', ''] },
-    resists: { enabled: false, types: ['', '', '', ''] },
-    immuneTo: { enabled: false, searchType: '', types: ['', ''] },
-    notThese: { enabled: false, types: ['', '', '', ''] }
+    exactlyThese: { enabled: false, mode: 'Exactly These', types: [null, null, null, null] },
+    resists: { enabled: false, types: [null, null, null, null] },
+    immuneTo: { enabled: false, searchType: null, types: [null, null] },
+    notThese: { enabled: false, types: [null, null, null, null] }
   }
 
   // Reset price filters OOF
@@ -1250,6 +1261,36 @@ const resetAllFilters = () => {
   padding-left: 17px;
 }
 
+.type-label-box {
+  min-width: 170px;
+  max-width: 170px;
+  flex: 0 0 170px;
+  background-color: #AFFFA5;
+  color: #000000;
+  border: 1px solid rgba(0, 0, 0, 0.38);
+  border-radius: 4px;
+  padding: 7px 12px;
+  font-size: 0.875rem;
+  display: flex;
+  align-items: center;
+  height: 40px;
+}
+
+.type-label-box-red {
+  min-width: 170px;
+  max-width: 170px;
+  flex: 0 0 170px;
+  background-color: #FFBFBF;
+  color: #000000;
+  border: 1px solid rgba(0, 0, 0, 0.38);
+  border-radius: 4px;
+  padding: 7px 12px;
+  font-size: 0.875rem;
+  display: flex;
+  align-items: center;
+  height: 40px;
+}
+
 .type-dropdown {
   flex: 1 1 0;
   min-width: 110px;
@@ -1258,6 +1299,11 @@ const resetAllFilters = () => {
 .type-dropdown-search {
   flex: 1.5 1 0;
   min-width: 160px;
+}
+
+/* Hide dropdown arrow for readonly type labels */
+:deep(.v-select.no-arrow .v-field__append-inner) {
+  display: none;
 }
 
 :deep(input[type="number"]::-webkit-inner-spin-button),

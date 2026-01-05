@@ -388,6 +388,7 @@
                                       hide-details
                                       bg-color="white"
                                       placeholder="--"
+                                      clearable
                                     ></v-select>
                                   </v-col>
                                 </v-row>
