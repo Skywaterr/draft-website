@@ -637,6 +637,10 @@ const teraPriceRange = ref([1, 20])
 const selectedTiers = ref<string[]>([])
 const selectedTeraTypes = ref<number[]>([])
 
+// Grab the parameters from the old search
+let params = new URLSearchParams(window.location.search);
+
+
 // Type filters - matching sidebar structure
 const typeFilters = ref({
   exactType: [null, null, null, null],
@@ -797,9 +801,10 @@ const debounce = (fn: Function, delay: number) => {
   }
 }
 
+
 // Parse URL params and populate sidebar
 const populateFiltersFromURL = () => {
-  const params = new URLSearchParams(window.location.search)
+  // const params = new URLSearchParams(window.location.search)
   
   console.log('🔍 Parsing URL params:', params.toString())
   
@@ -864,11 +869,11 @@ const populateFiltersFromURL = () => {
 
 // Build query params from sidebar
 const buildQueryFromSidebar = () => {
-  const params = new URLSearchParams()
+  const paramsCopy = new URLSearchParams(params);
   
   // Add name/quick search
   if (quickSearch.value.trim()) {
-    params.append('name', quickSearch.value.trim())
+    paramsCopy.append('name', quickSearch.value.trim())
   }
   
   // Build stat filters
@@ -876,35 +881,35 @@ const buildQueryFromSidebar = () => {
     if (stat.enabled && stat.value) {
       const backendField = statFieldMap[stat.id]
       const backendOp = operatorMap[stat.operator]
-      params.append(`${backendField}[${backendOp}]`, stat.value)
+      paramsCopy.append(`${backendField}[${backendOp}]`, stat.value)
     }
   })
   
   // Build type filters - Exact Type
   const hasExactTypes = typeFilters.value.exactType.some(t => t !== '')
   if (hasExactTypes) {
-    params.append('exact', '') // Add exact flag
+    paramsCopy.append('exact', '') // Add exact flag
     typeFilters.value.exactType.forEach(type => {
-      if (type) params.append('type', type)
+      if (type) paramsCopy.append('type', type)
     })
   }
   
   // Build type filters - Resistances
   typeFilters.value.resistances.forEach(type => {
-    if (type) params.append('resist', type)
+    if (type) paramsCopy.append('resist', type)
   })
   
   // Build type filters - Immunities
   typeFilters.value.immunities.forEach(type => {
-    if (type) params.append('immune', type)
+    if (type) paramsCopy.append('immune', type)
   })
   
   // Build type filters - NOT These
   typeFilters.value.notThese.forEach(type => {
-    if (type) params.append('nottype', type)
+    if (type) paramsCopy.append('nottype', type)
   })
   
-  return params.toString()
+  return paramsCopy.toString()
 }
 
 // Update search from sidebar changes

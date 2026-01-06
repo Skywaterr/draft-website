@@ -223,7 +223,7 @@ function generateFilters(routeQuery) {
 function buildQuery(filters, args) {
     // Using what is returned in req.query from the request route,
     // make an SQL query from it with the appropriate filters
-    let sql = `SELECT DISTINCT p.Name, p.Pokemon, p.Type1, p.Type2, HP, Atk, Def, "S.At", "S.Df", Spd, BST FROM Pokemon p\n`;
+    let sql = `SELECT DISTINCT p.ID, p.Name, p.Pokemon, p.Type1, p.Type2, HP, Atk, Def, "S.At", "S.Df", Spd, BST FROM Pokemon p\n`;
     var joins = [];
     const searches = [];
 
@@ -364,10 +364,9 @@ function generateTypeFilters(routeQuery) {
         }
     }
 
-    if (!types && !resistances && !immunities && !not_matches) {
+    if (types.length === 0 && resistances.length === 0 && immunities.length === 0 && not_matches.length === 0) {
         no_query = true;
     }
-
     return {types, resistances, immunities, not_matches, exact, no_query} 
 
 }
@@ -494,6 +493,9 @@ module.exports = function(app) {
 
             // If there are type queries, we use them after the result is gotten by db.execute  
             const {types, resistances, immunities, not_matches, exact, no_query} = generateTypeFilters(req.query);
+            
+            console.log("noquery", no_query);
+            
             if (!no_query) {
                 rows = filterTypes(result.rows, types, resistances, immunities, not_matches, exact);
             }
