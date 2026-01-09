@@ -909,6 +909,7 @@ const buildQueryFromSidebar = () => {
     if (type) paramsCopy.append('nottype', type)
   })
   
+  params = paramsCopy;
   return paramsCopy.toString()
 }
 
@@ -916,13 +917,16 @@ const buildQueryFromSidebar = () => {
 const updateSearchFromSidebar = debounce(() => {
   const queryString = buildQueryFromSidebar()
   
+  
   console.log('🔄 Updating search with:', queryString)
   
   // Update URL without reloading page
   router.replace(`/search/results?${queryString}`)
   
+  console.log("Calling because of an update");
+
   // Refetch results
-  fetchResults()
+  // fetchResults()
 }, 500) // 500ms debounce
 
 // Fetch results from backend
@@ -945,6 +949,8 @@ const fetchResults = async () => {
     // Fetch from backend
     const response = await fetch(`http://localhost:3000/pokemon?${queryString}`)
     
+    console.log("The actual querystring", response);
+
     if (!response.ok) {
       throw new Error(`Server returned ${response.status}: ${response.statusText}`)
     }
@@ -975,6 +981,7 @@ const performQuickSearch = () => {
 // Watch for route changes (e.g., back/forward buttons)
 watch(() => route.query, () => {
   populateFiltersFromURL()
+  console.log("Calling because of a route change");
   fetchResults()
 })
 
