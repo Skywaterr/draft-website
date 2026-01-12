@@ -127,3 +127,20 @@ const abilityNames = ref<string[]>([]);
 const res = await fetch(http://localhost:3000/abilities);
 const data = await res.json(); 
 abilityNames.value = data.map(item => item.AbilityName);
+
+You can look up type matchups with http://localhost:3000/matchups/type=Name1&type=Name2.
+It will return results in the form of
+
+{
+    "Weaknesses": [names],
+    "Resistances": [names],
+    "Immunities": [names]
+}
+
+For example, http://localhost:3000/matchups/type=Water&type=Ground will find its type matchups:
+
+{
+    "Weaknesses": ["Grass"],
+    "Resistances": ["Fire","Poison","Rock","Steel"],
+    "Immunities":["Electric"]
+}

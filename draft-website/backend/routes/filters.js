@@ -328,7 +328,7 @@ function calculateStrength(type1, type2, against) {
             break;
         }
     }
-
+    console.log(strength);
  
     return strength;
 }
@@ -473,6 +473,60 @@ function filterTypes(result_rows, types, resistances, immunities, not_matches, e
 
 }
 
+// Search for the type object by string
+function typeSearch(name) {
+    for (const type of types) {
+        if (name.toLowerCase() === type.name.toLowerCase()) {
+            return type;
+        }
+    }
+    return nullType;
+}
+
+function calculateMatchups(routeQuery) {
+    // Give resistances, weaknesses, and immunities on a certain query
+    // such as /matchups/type=Water&type=Fire
+    const names = []
+    for (const type of types) {
+        names.push(type.name.toLowerCase());
+    }
+
+    var typeNames = [routeQuery["type"]];
+    typeNames = typeNames.flat();
+    const searchedTypes = [];
+
+    for (const name of typeNames) {
+        searchedTypes.push(typeSearch(name));
+    }
+
+    if (searchedTypes.length > 2) {
+        throw new Error("Only two types can be searched at once");
+    }
+
+    const [type1, type2] = searchedTypes;
+    const weaknesses = [];
+    const resistances = [];
+    const immunities = [];
+
+    // Classify our type matchup against all other types
+    for (const type of types) {
+        let strength = null;
+        if (type2 === undefined) {
+            strength = calculateStrength(type1.name, nullType, type.name);
+        } else {
+            strength = calculateStrength(type1.name, type2.name, type.name);
+        }
+        
+        if (strength === 0) immunities.push(type.name);
+        else if (strength < 1) weaknesses.push(type.name);
+        else if (strength > 1) resistances.push(type.name);
+    }
+
+    return {"Weaknesses": weaknesses, 
+            "Resistances": resistances, 
+            "Immunities": immunities};
+}
+
 
 module.exports = function(app) {
     const router = express.Router();
@@ -551,6 +605,15 @@ module.exports = function(app) {
         }
     })
 
+    router.get("/matchups", async (req, res) => {
+        try {
+            const result = calculateMatchups(req.query);            
+            res.json(result);
+        } catch(err) {
+            console.error(err);
+            res.status(500).json({error: 'Calculation failed'});
+        }
+    });
 
     app.use('/', router);
 };
