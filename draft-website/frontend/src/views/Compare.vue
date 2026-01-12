@@ -4,7 +4,7 @@
     
     <v-main style="background-color: #FFDEDE;">
       <v-container fluid class="py-8">
-<!-- ROW 1: Headers -->
+        <!-- ROW 1: Headers -->
         <v-row dense class="mb-0">
           <v-col cols="4" class="pb-1">
             <div class="roster-header" v-if="comparisonMode === 'Type Matchups'">Roster</div>
@@ -21,15 +21,7 @@
         <!-- ROW 2: Buttons + Mode Selector -->
         <v-row dense class="mb-0" style="margin-top: -8px;">
           <v-col cols="4" class="py-1">
-            <div class="d-flex" v-if="comparisonMode === 'Type Matchups'">
-              <v-btn variant="flat" class="roster-button" style="margin-right: -32px;" @click="loadRoster('left')">
-                Load a roster!
-              </v-btn>
-              <v-btn variant="flat" class="roster-button" @click="saveRoster('left')">
-                Save this roster!
-              </v-btn>
-            </div>
-            <div class="d-flex" v-else>
+            <div class="d-flex">
               <v-btn variant="flat" class="roster-button" style="margin-right: -32px;" @click="loadRoster('left')">
                 Load a roster!
               </v-btn>
@@ -67,10 +59,7 @@
         <!-- ROW 3: Clear buttons -->
         <v-row dense class="mb-1" style="margin-top: -21px;">
           <v-col cols="4" class="pt-1 pb-2 d-flex justify-center">
-            <v-btn variant="flat" class="roster-button-half" @click="clearRosters" v-if="comparisonMode === 'Type Matchups'">
-              Clear Saved Rosters
-            </v-btn>
-            <v-btn variant="flat" class="roster-button-half" @click="clearRosters" v-else>
+            <v-btn variant="flat" class="roster-button-half" @click="clearRosters">
               Clear Saved Rosters
             </v-btn>
           </v-col>
@@ -87,7 +76,8 @@
           v-if="comparisonMode === 'Speed'"
           :left-roster="leftRoster"
           :right-roster="rightRoster"
-          @add-pokemon="addPokemon"
+          :all-pokemon="allPokemon"
+          @add-pokemon="addPokemonToRoster"
           @remove-pokemon="removePokemon"
         />
         
@@ -95,13 +85,15 @@
           v-else-if="comparisonMode === 'Other Base Stats'"
           :left-roster="leftRoster"
           :right-roster="rightRoster"
-          @add-pokemon="addPokemon"
+          :all-pokemon="allPokemon"
+          @add-pokemon="addPokemonToRoster"
           @remove-pokemon="removePokemon"
         />
         
         <TypeMatchupsCompare 
           v-else
           :roster="leftRoster"
+          :all-pokemon="allPokemon"
           @add-pokemon="addPokemonToLeft"
           @remove-pokemon="removePokemonFromLeft"
         />
@@ -111,27 +103,65 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { ref, watch, onMounted } from 'vue'
 import AppNavbar from '@/components/AppNavbar.vue'
 import SpeedCompare from '@/views/compare/SpeedCompare.vue'
 import BaseStatsCompare from '@/views/compare/BaseStatsCompare.vue'
 import TypeMatchupsCompare from '@/views/compare/TypeMatchupsCompare.vue'
 
+// Pokemon data from backend WIP
+const allPokemon = ref<any[]>([])
+
 // Load from localStorage or default to 'Speed'
 const comparisonMode = ref(localStorage.getItem('comparisonMode') || 'Speed')
-const leftRoster = ref<(string | null)[]>(Array(12).fill(null))
-const rightRoster = ref<(string | null)[]>(Array(12).fill(null))
+const leftRoster = ref<any[]>(Array(12).fill(null))
+const rightRoster = ref<any[]>(Array(12).fill(null))
+
+// Fetch all Pokemon names from backend on mount
+onMounted(async () => {
+  try {
+    const response = await fetch('http://localhost:3000/names')
+    if (!response.ok) throw new Error('Failed to fetch Pokemon')
+    const data = await response.json()
+    
+    // data = [{ Name: "pikachu", Pokemon: "Pikachu" }, ...]
+    allPokemon.value = data
+    console.log(`✅ Loaded ${data.length} Pokemon`)
+  } catch (err) {
+    console.error('❌ Failed to load Pokemon:', err)
+  }
+})
 
 // Save to localStorage whenever mode changes
 watch(comparisonMode, (newMode) => {
   localStorage.setItem('comparisonMode', newMode)
 })
 
-function addPokemon(payload: { side: 'left' | 'right', pokemon: string }) {
+// Add Pokemon to roster (called from child components)
+const addPokemonToRoster = async (payload: { side: 'left' | 'right', pokemonName: string }) => {
   const roster = payload.side === 'left' ? leftRoster : rightRoster
+  
+  // Check if roster is full
   const emptyIndex = roster.value.findIndex(slot => slot === null)
-  if (emptyIndex !== -1) {
-    roster.value[emptyIndex] = payload.pokemon
+  if (emptyIndex === -1) {
+    alert(`${payload.side === 'left' ? 'Left' : 'Right'} roster is full!`)
+    return
+  }
+  
+  // Fetch full Pokemon data from backend
+  try {
+    const response = await fetch(`http://localhost:3000/pokemon?name=${encodeURIComponent(payload.pokemonName)}`)
+    if (!response.ok) throw new Error('Failed to fetch Pokemon stats')
+    const data = await response.json()
+    
+    if (data.length > 0) {
+      const fullPokemon = data[0]
+      roster.value[emptyIndex] = fullPokemon
+      console.log(`✅ Added ${fullPokemon.Pokemon} to ${payload.side} roster`, fullPokemon)
+    }
+  } catch (err) {
+    console.error('❌ Failed to fetch Pokemon stats:', err)
+    alert('Failed to add Pokemon. Please try again.')
   }
 }
 
@@ -177,8 +207,8 @@ function clearRosters() {
   }
 }
 
-function addPokemonToLeft(pokemon: string) {
-  addPokemon({ side: 'left', pokemon })
+function addPokemonToLeft(pokemonName: string) {
+  addPokemonToRoster({ side: 'left', pokemonName })
 }
 
 function removePokemonFromLeft(index: number) {
